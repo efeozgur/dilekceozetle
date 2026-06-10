@@ -37,9 +37,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
+        // İlk girişte DB'den pro statüsünü çek
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: {
+            subscription: true,
+            pendingPayment: true,
+            proActivatedAt: true,
+          },
+        });
+        if (dbUser) {
+          token.subscription = dbUser.subscription;
+          token.pendingPayment = dbUser.pendingPayment;
+          token.proActivatedAt = dbUser.proActivatedAt?.toISOString() ?? null;
+        }
+      }
+      // Session güncellemelerinde (örn. update()) DB'den taze veri çek
+      if (trigger === "update" && token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: {
+            subscription: true,
+            pendingPayment: true,
+            proActivatedAt: true,
+          },
+        });
+        if (dbUser) {
+          token.subscription = dbUser.subscription;
+          token.pendingPayment = dbUser.pendingPayment;
+          token.proActivatedAt = dbUser.proActivatedAt?.toISOString() ?? null;
+        }
       }
       return token;
     },
@@ -47,6 +77,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (token?.id) {
         session.user.id = token.id as string;
       }
+      session.user.subscription = (token.subscription as string) ?? "free";
+      session.user.pendingPayment = (token.pendingPayment as boolean) ?? false;
+      session.user.proActivatedAt = (token.proActivatedAt as string | null) ?? null;
+
+      // recentPro: son 5 dakika içinde Pro aktif olduysa
+      if (token.proActivatedAt) {
+        const activatedAt = new Date(token.proActivatedAt as string);
+        const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
+        session.user.recentPro = activatedAt > fiveMinAgo;
+      } else {
+        session.user.recentPro = false;
+      }
+
       return session;
     },
   },

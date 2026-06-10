@@ -1,7 +1,8 @@
 "use client";
 
-import { Clock, FileText, Trash2, RefreshCcw, X, Copy, Check } from "lucide-react";
+import { Clock, FileText, Trash2, RefreshCcw, X, Copy, Check, AlertTriangle, PartyPopper, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 interface Summary {
   id: string;
@@ -29,12 +30,17 @@ function formatDate(dateStr: string): string {
   });
 }
 
+const BANNER_DISMISS_KEY = "dilekceozet_payment_banner_dismissed";
+
 export default function DashboardPage() {
+  const { data: session, update } = useSession();
   const [summaries, setSummaries] = useState<Summary[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [selected, setSelected] = useState<Summary | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showPendingBanner, setShowPendingBanner] = useState(false);
 
   const fetchSummaries = async () => {
     setLoading(true);
@@ -50,6 +56,30 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+
+  // Pro aktif toast ve pending banner kontrolü
+  useEffect(() => {
+    if (!session?.user) return;
+
+    // recentPro: başarılı Pro aktif olunca toast göster
+    if (session.user.recentPro && !showSuccess) {
+      setShowSuccess(true);
+      // 8 saniye sonra otomatik kapat
+      const t = setTimeout(() => setShowSuccess(false), 8000);
+      // session'daki recentPro'yı temizle (sayfa yenilenince tekrar göstermesin)
+      update({}).catch(() => {});
+      return () => clearTimeout(t);
+    }
+
+    // pendingPayment + hala free: uyarı banner'ı
+    if (
+      session.user.pendingPayment === true &&
+      session.user.subscription !== "pro" &&
+      !sessionStorage.getItem(BANNER_DISMISS_KEY)
+    ) {
+      setShowPendingBanner(true);
+    }
+  }, [session, showSuccess, update]);
 
   useEffect(() => {
     fetchSummaries();
@@ -78,8 +108,67 @@ export default function DashboardPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const dismissPendingBanner = () => {
+    setShowPendingBanner(false);
+    sessionStorage.setItem(BANNER_DISMISS_KEY, Date.now().toString());
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Pro Aktif Toast */}
+      {showSuccess && (
+        <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="flex items-start gap-3 bg-emerald-50 border border-emerald-200 rounded-2xl shadow-lg p-4 pr-3 max-w-sm">
+            <div className="shrink-0 w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+              <PartyPopper className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-emerald-900">Pro üyeliğiniz aktif edildi!</p>
+              <p className="text-xs text-emerald-700 mt-0.5">
+                Sınırsız özetleme, karşılaştırma ve diğer Pro özelliklerinin keyfini çıkarın.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowSuccess(false)}
+              className="p-1 text-emerald-700 hover:bg-emerald-100 rounded-lg transition-colors cursor-pointer shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Pending Payment Uyarı Banner */}
+      {showPendingBanner && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
+          <div className="shrink-0 w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+            <AlertTriangle className="h-5 w-5 text-red-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-red-900">Ödemeniz henüz eşleşmedi</p>
+            <p className="text-xs text-red-700 mt-1 leading-relaxed">
+              IBAN'a gönderdiğiniz tutar doğrulandıktan sonra Pro üyeliğiniz otomatik olarak
+              aktif edilecek. Bu işlem genellikle birkaç saat içinde tamamlanır. Sorun yaşıyorsanız
+              <a
+                href="mailto:destek@ozgurapp.com"
+                className="font-semibold underline ml-1 inline-flex items-center gap-1"
+              >
+                <Mail className="h-3 w-3" />
+                destek@ozgurapp.com
+              </a>
+              {" "}adresine yazın.
+            </p>
+          </div>
+          <button
+            onClick={dismissPendingBanner}
+            className="p-1 text-red-700 hover:bg-red-100 rounded-lg transition-colors cursor-pointer shrink-0"
+            aria-label="Uyarıyı kapat"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Gecmisim</h1>

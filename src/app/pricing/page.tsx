@@ -32,7 +32,7 @@ const plans = [
       "Ozel prompt sablonlari",
     ],
     cta: "Pro'ya Gec",
-    ctaHref: "/payment",
+    ctaHref: "/upgrade",
     popular: true,
   },
   {
@@ -59,8 +59,8 @@ export default function PricingPage() {
   const router = useRouter();
 
   const handleCtaClick = (plan: typeof plans[number]) => {
-    if (plan.ctaHref === "/payment" && !session) {
-      router.push("/auth/login");
+    if (plan.ctaHref === "/upgrade" && !session) {
+      router.push("/auth/login?callbackUrl=/upgrade");
       return;
     }
     if (plan.ctaHref.startsWith("mailto:")) {

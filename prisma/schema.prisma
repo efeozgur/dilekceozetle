@@ -15,11 +15,15 @@ model User {
   subscription         String    @default("free")
   stripeCustomerId     String?   @unique
   stripeSubscriptionId String?
+  pendingPayment       Boolean   @default(false)
+  proActivatedAt       DateTime?
+  proUpgradeCount      Int       @default(0)
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
   accounts             Account[]
   sessions             Session[]
   summaries            Summary[]
+  paymentRequests      PaymentRequest[]
 }
 
 model Account {
@@ -72,4 +76,22 @@ model Summary {
   tokenEstimate       Int?
   createdAt           DateTime @default(now())
   user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PaymentRequest {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan         String
+  ibanLast4    String
+  amountTry    Int
+  note         String?
+  status       String    @default("PENDING")
+  reviewedAt   DateTime?
+  rejectReason String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId, status])
+  @@index([status, createdAt])
 }
