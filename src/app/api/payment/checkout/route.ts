@@ -31,7 +31,7 @@ export async function POST() {
 
   try {
     const result = shopier.createPayment({
-      amount: 199,
+      amount: 299,
       currency: Currency.TL,
       maxInstallment: 0,
       buyer: {

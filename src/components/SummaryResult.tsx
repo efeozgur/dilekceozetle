@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Check, RotateCcw, FileText } from "lucide-react";
+import { Copy, Check, RotateCcw, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { SummaryStats, type SummaryStatsData } from "./stats/SummaryStats";
 
@@ -12,6 +12,7 @@ interface SummaryResultProps {
 
 export function SummaryResult({ text, stats, onReset }: SummaryResultProps) {
   const [copied, setCopied] = useState(false);
+  const [showStats, setShowStats] = useState(false);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(text);
@@ -20,7 +21,7 @@ export function SummaryResult({ text, stats, onReset }: SummaryResultProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -36,9 +37,16 @@ export function SummaryResult({ text, stats, onReset }: SummaryResultProps) {
         </span>
       </div>
 
-      {/* Summary Text */}
-      <div className="p-6 bg-muted/30 border border-border rounded-2xl text-sm leading-relaxed text-foreground">
-        {text}
+      {/* Summary Text - PROMINENT */}
+      <div className="relative p-6 bg-gradient-to-r from-indigo-50/80 via-white to-violet-50/80 border-l-4 border-l-indigo-500 rounded-2xl shadow-sm">
+        <div className="absolute top-3 right-3">
+          <span className="text-[10px] font-medium text-indigo-400 bg-indigo-50 px-2 py-0.5 rounded-full">
+            ÖZET
+          </span>
+        </div>
+        <p className="text-base leading-relaxed text-foreground font-medium whitespace-pre-wrap">
+          {text}
+        </p>
       </div>
 
       {/* Actions */}
@@ -69,9 +77,24 @@ export function SummaryResult({ text, stats, onReset }: SummaryResultProps) {
         </button>
       </div>
 
-      {/* Statistics */}
-      <div className="border-t border-border pt-8">
-        <SummaryStats data={stats} />
+      {/* Statistics - Collapsible */}
+      <div className="border-t border-border pt-4">
+        <button
+          onClick={() => setShowStats(!showStats)}
+          className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          {showStats ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+          📊 İstatistikleri {showStats ? "Gizle" : "Göster"}
+        </button>
+        {showStats && (
+          <div className="mt-4">
+            <SummaryStats data={stats} />
+          </div>
+        )}
       </div>
     </div>
   );

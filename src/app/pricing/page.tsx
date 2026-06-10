@@ -11,7 +11,7 @@ const plans = [
     period: "",
     description: "Basmaya baslamak icin ideal",
     features: [
-      "Ayda 5 ozet",
+      "Ayda 3 ozet",
       "Temel ozetleme",
       "Metin kopyalama",
     ],
@@ -21,14 +21,14 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "199",
+    price: "299",
     period: "/ay",
     description: "Profesyonel kullanicilar icin",
     features: [
       "Sinirsiz ozetleme",
-      "Gelistirilmis ozet kalitesi",
+      "Kisa ve uzun ozet secenekleri",
       "Ozet gecmisi",
-      "PDF disa aktarma",
+      "Dilekce karsilastirma",
       "Ozel prompt sablonlari",
     ],
     cta: "Pro'ya Gec",
@@ -37,7 +37,7 @@ const plans = [
   },
   {
     name: "Kurumsal",
-    price: "499",
+    price: "799",
     period: "/ay",
     description: "Ekipler ve kurumlar icin",
     features: [

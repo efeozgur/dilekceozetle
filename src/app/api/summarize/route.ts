@@ -48,6 +48,44 @@ export async function POST(req: Request) {
       );
     }
 
+    // Check subscription and usage limits
+    const session = await auth();
+    if (session?.user?.id) {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { subscription: true },
+      });
+
+      if (user) {
+        // Free users: only medium length allowed
+        if (user.subscription === "free" && length !== "medium") {
+          return NextResponse.json(
+            { error: "Ücretsiz planlarda sadece 'Orta' uzunluk kullanılabilir. Kısa ve uzun özetler için Pro plana yükseltin." },
+            { status: 403 }
+          );
+        }
+
+        // Free users: max 3 summaries per month
+        if (user.subscription === "free") {
+          const now = new Date();
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+          const monthlyCount = await prisma.summary.count({
+            where: {
+              userId: session.user.id,
+              createdAt: { gte: startOfMonth },
+            },
+          });
+
+          if (monthlyCount >= 3) {
+            return NextResponse.json(
+              { error: "Bu ayki ücretsiz özet hakkınız (3) dolmuştur. Pro plana yükselterek sınırsız özet oluşturabilirsiniz." },
+              { status: 403 }
+            );
+          }
+        }
+      }
+    }
+
     const summary = await summarizePetition(text, length as SummaryLength);
 
     const originalWordCount = countWords(text);
@@ -59,7 +97,6 @@ export async function POST(req: Request) {
     const summaryReadingTime = estimateReadingTime(summaryWordCount);
 
     // Save to database if user is logged in
-    const session = await auth();
     if (session?.user?.id) {
       await prisma.summary.create({
         data: {

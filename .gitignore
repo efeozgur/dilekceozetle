@@ -40,4 +40,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# database
+/prisma/dev.db
+/prisma/dev.db-journal
+*.sqlite
+*.sqlite-journal
+
+# session logs (Kişisel AI oturum logları, repoya girmemeli)
+/session-*.md
+
 /src/generated/prisma

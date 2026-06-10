@@ -91,7 +91,7 @@ export default function PaymentPage() {
           {/* Price */}
           <div className="px-8 py-5 border-b border-border bg-muted/20">
             <div className="flex items-baseline justify-center gap-1">
-              <span className="text-4xl font-bold text-foreground">199</span>
+              <span className="text-4xl font-bold text-foreground">299</span>
               <span className="text-muted-foreground">TL / ay</span>
             </div>
           </div>
@@ -123,7 +123,7 @@ export default function PaymentPage() {
               ) : (
                 <>
                   <CreditCard className="h-4 w-4" />
-                  199 TL Ode
+                  299 TL Ode
                 </>
               )}
             </button>

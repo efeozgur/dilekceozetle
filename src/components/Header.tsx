@@ -18,18 +18,21 @@ export function Header() {
             <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-gradient-start to-gradient-end rounded-lg">
               <Scale className="h-4.5 w-4.5 text-white" />
             </div>
-            <span className="hidden sm:inline">Dilekce Ozeti</span>
+            <span className="hidden sm:inline">Dilekçe Özeti</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
             <Link href="/" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer">
               Ana Sayfa
             </Link>
+            <Link href="/compare" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer">
+              Karşılaştır
+            </Link>
             <Link href="/dashboard" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer">
-              Gecmisim
+              Geçmişim
             </Link>
             <Link href="/pricing" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer">
-              Fiyatlandirma
+              Fiyatlandırma
             </Link>
           </nav>
 
@@ -42,7 +45,7 @@ export function Header() {
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-xl transition-all duration-200 cursor-pointer"
                 >
                   <LogOut className="h-4 w-4" />
-                  Cikis Yap
+                  Çıkış Yap
                 </button>
               </>
             ) : (
@@ -51,13 +54,13 @@ export function Header() {
                   href="/auth/login"
                   className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground rounded-xl transition-all duration-200 cursor-pointer"
                 >
-                  Giris Yap
+                  Giriş Yap
                 </Link>
                 <Link
                   href="/auth/register"
                   className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-xl hover:bg-primary-dark transition-all duration-200 shadow-sm shadow-primary/25 cursor-pointer"
                 >
-                  Kayit Ol
+                  Kayıt Ol
                 </Link>
               </>
             )}
@@ -66,7 +69,7 @@ export function Header() {
           <button
             className="md:hidden p-2 rounded-xl hover:bg-muted transition-colors duration-200 cursor-pointer"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Menuyu ac/kapat"
+            aria-label="Menüyü aç/kapat"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -77,11 +80,14 @@ export function Header() {
             <Link href="/" className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
               Ana Sayfa
             </Link>
+            <Link href="/compare" className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
+              Karşılaştır
+            </Link>
             <Link href="/dashboard" className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
-              Gecmisim
+              Geçmişim
             </Link>
             <Link href="/pricing" className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
-              Fiyatlandirma
+              Fiyatlandırma
             </Link>
             <div className="pt-2 border-t border-border flex flex-col gap-2">
               {isLoggedIn ? (
@@ -90,15 +96,15 @@ export function Header() {
                   className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-xl transition-all duration-200 cursor-pointer"
                 >
                   <LogOut className="h-4 w-4" />
-                  Cikis Yap
+                  Çıkış Yap
                 </button>
               ) : (
                 <>
                   <Link href="/auth/login" className="px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
-                    Giris Yap
+                    Giriş Yap
                   </Link>
                   <Link href="/auth/register" className="px-4 py-3 text-sm font-medium bg-primary text-primary-foreground rounded-xl text-center hover:bg-primary-dark transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
-                    Kayit Ol
+                    Kayıt Ol
                   </Link>
                 </>
               )}
