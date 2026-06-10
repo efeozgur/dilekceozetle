@@ -27,7 +27,7 @@ export async function POST() {
 
   const nameParts = (session.user.name || "Kullanici").split(" ");
   const firstName = nameParts[0] || "Kullanici";
-  const lastName = nameParts.slice(1).join(" ") || " ";
+  const lastName = nameParts.slice(1).join(" ") || "Kullanici";
 
   try {
     const result = shopier.createPayment({

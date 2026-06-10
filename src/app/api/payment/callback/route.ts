@@ -20,20 +20,25 @@ export async function POST(req: Request) {
     const result = shopier.verifyCallback(data as any);
 
     if (result.success) {
-      const orderId = result.orderId;
-
-      // Update user subscription
-      const order = await prisma.summary.findFirst({
-        where: { id: orderId },
+      const order = await prisma.summary.findUnique({
+        where: { id: result.orderId },
       });
 
-      // Try to find user by email from callback
-      const userEmail = data["customer_email"] || data["buyer_email"];
-      if (userEmail) {
-        await prisma.user.updateMany({
-          where: { email: userEmail },
+      // Prefer the original order relation; the callback email is not always reliable.
+      if (order) {
+        await prisma.user.update({
+          where: { id: order.userId },
           data: { subscription: "pro" },
         });
+      } else {
+        // Fallback for older/partial flows that may not have the pending order row.
+        const userEmail = data["customer_email"] || data["buyer_email"];
+        if (userEmail) {
+          await prisma.user.updateMany({
+            where: { email: userEmail },
+            data: { subscription: "pro" },
+          });
+        }
       }
     }
 
