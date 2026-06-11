@@ -41,6 +41,7 @@ export default function DashboardPage() {
   const [totalSummaries, setTotalSummaries] = useState(0);
   const [subscription, setSubscription] = useState("free");
   const [loading, setLoading] = useState(true);
+  const isAdmin = session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
   const [deleting, setDeleting] = useState<string | null>(null);
   const [selected, setSelected] = useState<Summary | null>(null);
   const [copied, setCopied] = useState(false);
@@ -194,7 +195,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Kullanım Göstergesi */}
-      {subscription === "free" && (
+      {subscription === "free" && !isAdmin && (
         <div className="mb-6">
           <UsageBar
             used={totalSummaries}

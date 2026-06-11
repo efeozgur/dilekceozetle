@@ -25,6 +25,7 @@ export default function Home() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [totalSummaries, setTotalSummaries] = useState(0);
   const [subscription, setSubscription] = useState("free");
+  const isAdmin = session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
   const fetchUsage = useCallback(async () => {
     try {
@@ -83,7 +84,7 @@ export default function Home() {
       {/* Main Card */}
       <div className="bg-white border border-border rounded-3xl shadow-sm shadow-border/50 p-6 sm:p-8 mb-14">
         {/* Kullanım Göstergesi */}
-        {session && subscription === "free" && (
+        {session && subscription === "free" && !isAdmin && (
           <div className="mb-5">
             <UsageBar
               used={totalSummaries}

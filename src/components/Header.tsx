@@ -10,6 +10,7 @@ export function Header() {
   const { data: session } = useSession();
   const isLoggedIn = !!session;
   const isPro = session?.user?.subscription === "pro";
+  const isAdmin = session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
   return (
     <header className="sticky top-4 z-50 mx-4 sm:mx-6 lg:mx-8 mt-4">
@@ -34,12 +35,12 @@ export function Header() {
                 Geçmişim
               </Link>
             )}
-            {!isPro && (
+            {!isPro && !isAdmin && (
               <Link href="/pricing" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer">
                 Fiyatlandırma
               </Link>
             )}
-            {session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
+            {isAdmin && (
               <Link href="/admin" className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-xl transition-all duration-200 cursor-pointer">
                 <Shield className="h-3.5 w-3.5" />
                 Admin
@@ -102,7 +103,7 @@ export function Header() {
                 Geçmişim
               </Link>
             )}
-            {!isPro && (
+            {!isPro && !isAdmin && (
               <Link href="/pricing" className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
                 Fiyatlandırma
               </Link>
@@ -113,7 +114,7 @@ export function Header() {
                 Hesabım
               </Link>
             )}
-            {session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
+            {isAdmin && (
               <Link href="/admin" className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-primary hover:bg-primary/10 rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
                 <Shield className="h-4 w-4" />
                 Admin
