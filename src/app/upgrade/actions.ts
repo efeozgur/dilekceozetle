@@ -4,8 +4,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { sendAdminPaymentRequestEmail } from "@/lib/email";
+import { getSystemSettings } from "@/lib/settings";
 
-const PRO_PRICE_TRY = 299;
 const MAX_NOTE_LENGTH = 500;
 
 export type SubmitResult =
@@ -28,14 +28,17 @@ export async function submitPaymentRequest(input: {
     return { ok: false, error: "IBAN son 4 hane 4 rakam olmalıdır." };
   }
 
+  const settings = await getSystemSettings();
+  const proPrice = parseInt(settings.pro_price) || 299;
+
   const amountTry = Number(input.amountTry);
   if (!Number.isFinite(amountTry) || !Number.isInteger(amountTry)) {
     return { ok: false, error: "Tutar geçerli bir tam sayı olmalıdır." };
   }
-  if (amountTry < PRO_PRICE_TRY) {
+  if (amountTry < proPrice) {
     return {
       ok: false,
-      error: `Tutar en az ${PRO_PRICE_TRY} TL olmalıdır.`,
+      error: `Tutar en az ${proPrice} TL olmalıdır.`,
     };
   }
 

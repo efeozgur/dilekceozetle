@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Scale, Menu, X, LogOut } from "lucide-react";
+import { Scale, Menu, X, LogOut, Shield, User } from "lucide-react";
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 
@@ -9,6 +9,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { data: session } = useSession();
   const isLoggedIn = !!session;
+  const isPro = session?.user?.subscription === "pro";
 
   return (
     <header className="sticky top-4 z-50 mx-4 sm:mx-6 lg:mx-8 mt-4">
@@ -28,18 +29,31 @@ export function Header() {
             <Link href="/compare" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer">
               Karşılaştır
             </Link>
-            <Link href="/dashboard" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer">
-              Geçmişim
-            </Link>
-            <Link href="/pricing" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer">
-              Fiyatlandırma
-            </Link>
+            {isLoggedIn && (
+              <Link href="/dashboard" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer">
+                Geçmişim
+              </Link>
+            )}
+            {!isPro && (
+              <Link href="/pricing" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer">
+                Fiyatlandırma
+              </Link>
+            )}
+            {session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
+              <Link href="/admin" className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-xl transition-all duration-200 cursor-pointer">
+                <Shield className="h-3.5 w-3.5" />
+                Admin
+              </Link>
+            )}
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
             {isLoggedIn ? (
               <>
-                <span className="text-xs text-muted-foreground mr-2">{session.user?.email}</span>
+                <Link href="/account" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer">
+                  <User className="h-3.5 w-3.5" />
+                  Hesabım
+                </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-xl transition-all duration-200 cursor-pointer"
@@ -83,12 +97,28 @@ export function Header() {
             <Link href="/compare" className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
               Karşılaştır
             </Link>
-            <Link href="/dashboard" className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
-              Geçmişim
-            </Link>
-            <Link href="/pricing" className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
-              Fiyatlandırma
-            </Link>
+            {isLoggedIn && (
+              <Link href="/dashboard" className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
+                Geçmişim
+              </Link>
+            )}
+            {!isPro && (
+              <Link href="/pricing" className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
+                Fiyatlandırma
+              </Link>
+            )}
+            {isLoggedIn && (
+              <Link href="/account" className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
+                <User className="h-4 w-4" />
+                Hesabım
+              </Link>
+            )}
+            {session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
+              <Link href="/admin" className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-primary hover:bg-primary/10 rounded-xl transition-all duration-200 cursor-pointer" onClick={() => setMobileOpen(false)}>
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
             <div className="pt-2 border-t border-border flex flex-col gap-2">
               {isLoggedIn ? (
                 <button

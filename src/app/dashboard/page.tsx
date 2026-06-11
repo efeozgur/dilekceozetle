@@ -3,9 +3,12 @@
 import { Clock, FileText, Trash2, RefreshCcw, X, Copy, Check, AlertTriangle, PartyPopper, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { ExportMenu } from "@/components/ExportMenu";
+import { UsageBar } from "@/components/UsageBar";
 
 interface Summary {
   id: string;
+  originalText: string;
   resultText: string;
   charCount: number;
   summaryCharCount: number | null;
@@ -35,6 +38,8 @@ const BANNER_DISMISS_KEY = "dilekceozet_payment_banner_dismissed";
 export default function DashboardPage() {
   const { data: session, update } = useSession();
   const [summaries, setSummaries] = useState<Summary[]>([]);
+  const [totalSummaries, setTotalSummaries] = useState(0);
+  const [subscription, setSubscription] = useState("free");
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [selected, setSelected] = useState<Summary | null>(null);
@@ -49,6 +54,8 @@ export default function DashboardPage() {
       const data = await res.json();
       if (res.ok) {
         setSummaries(data.summaries);
+        setTotalSummaries(data.totalSummaries ?? data.summaries.length);
+        setSubscription(data.subscription ?? "free");
       }
     } catch {
       // ignore
@@ -186,6 +193,18 @@ export default function DashboardPage() {
         </button>
       </div>
 
+      {/* Kullanım Göstergesi */}
+      {subscription === "free" && (
+        <div className="mb-6">
+          <UsageBar
+            used={totalSummaries}
+            total={5}
+            subscription={subscription}
+            compact
+          />
+        </div>
+      )}
+
       {loading && summaries.length === 0 && (
         <div className="text-center py-20 bg-white border border-border rounded-3xl">
           <RefreshCcw className="h-8 text-muted-foreground/20 mx-auto mb-4 animate-spin" />
@@ -296,6 +315,22 @@ export default function DashboardPage() {
                   {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
                   {copied ? "Kopyalandı" : "Kopyala"}
                 </button>
+                <ExportMenu
+                  data={{
+                    originalText: selected.originalText || "",
+                    resultText: selected.resultText,
+                    charCount: selected.charCount,
+                    summaryCharCount: selected.summaryCharCount,
+                    wordCount: selected.wordCount,
+                    summaryWordCount: selected.summaryWordCount,
+                    sentenceCount: selected.sentenceCount,
+                    summarySentenceCount: selected.summarySentenceCount,
+                    readingTime: selected.readingTime,
+                    summaryReadingTime: selected.summaryReadingTime,
+                    createdAt: selected.createdAt,
+                  }}
+                  compact
+                />
                 <button
                   onClick={() => handleDelete(selected.id)}
                   className="flex items-center gap-1.5 text-xs font-medium text-red-600 hover:text-red-700 border border-red-200 px-3 py-1.5 rounded-xl hover:bg-red-50 transition-all duration-200 cursor-pointer"

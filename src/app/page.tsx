@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { SummaryForm } from "@/components/SummaryForm";
 import { SummaryResult } from "@/components/SummaryResult";
 import { ErrorDisplay } from "@/components/ErrorDisplay";
+import { UpgradeModal } from "@/components/UpgradeModal";
+import { UsageBar } from "@/components/UsageBar";
 import { Scale, Shield, Zap, FileText, ArrowRight, Sparkles, Clock, Brain } from "lucide-react";
 import type { SummaryStatsData } from "@/components/stats/SummaryStats";
 
@@ -15,13 +18,37 @@ interface ResultData {
 }
 
 export default function Home() {
+  const { data: session } = useSession();
   const [view, setView] = useState<ViewState>("form");
   const [resultData, setResultData] = useState<ResultData | null>(null);
   const [error, setError] = useState("");
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [totalSummaries, setTotalSummaries] = useState(0);
+  const [subscription, setSubscription] = useState("free");
+
+  const fetchUsage = useCallback(async () => {
+    try {
+      const res = await fetch("/api/usage");
+      if (res.ok) {
+        const data = await res.json();
+        setTotalSummaries(data.totalSummaries);
+        setSubscription(data.subscription);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    if (session) {
+      fetchUsage();
+    }
+  }, [session, fetchUsage]);
 
   const handleResult = (data: { summary: string; stats: SummaryStatsData }) => {
     setResultData(data);
     setView("result");
+    if (session) fetchUsage();
   };
 
   const handleError = (msg: string) => {
@@ -55,8 +82,24 @@ export default function Home() {
 
       {/* Main Card */}
       <div className="bg-white border border-border rounded-3xl shadow-sm shadow-border/50 p-6 sm:p-8 mb-14">
+        {/* Kullanım Göstergesi */}
+        {session && subscription === "free" && (
+          <div className="mb-5">
+            <UsageBar
+              used={totalSummaries}
+              total={5}
+              subscription={subscription}
+              compact
+            />
+          </div>
+        )}
+
         {view === "form" && (
-          <SummaryForm onResult={handleResult} onError={handleError} />
+          <SummaryForm
+            onResult={handleResult}
+            onError={handleError}
+            onUpgradeRequired={() => setShowUpgradeModal(true)}
+          />
         )}
 
         {view === "result" && resultData && (
@@ -70,10 +113,16 @@ export default function Home() {
         {view === "error" && (
           <div className="space-y-4">
             <ErrorDisplay message={error} onDismiss={handleReset} />
-            <SummaryForm onResult={handleResult} onError={handleError} />
+            <SummaryForm
+              onResult={handleResult}
+              onError={handleError}
+              onUpgradeRequired={() => setShowUpgradeModal(true)}
+            />
           </div>
         )}
       </div>
+
+      <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
 
       {/* Features Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -138,7 +187,7 @@ export default function Home() {
       <div className="mt-16 text-center">
         <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
           <Zap className="h-4 w-4 text-primary" />
-          <span>Ücretsiz başlayın, kart gerekmez</span>
+          <span>Ücretsiz başlayın, hemen kayıt olun</span>
           <ArrowRight className="h-4 w-4" />
         </div>
       </div>

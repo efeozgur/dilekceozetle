@@ -5,10 +5,12 @@ import { FileText, Sparkles, Clipboard } from "lucide-react";
 import type { SummaryStatsData } from "./stats/SummaryStats";
 import type { SummaryLength } from "@/lib/prompts";
 import { LoadingOverlay } from "./LoadingOverlay";
+import { FileUpload } from "./FileUpload";
 
 interface SummaryFormProps {
   onResult: (data: { summary: string; stats: SummaryStatsData }) => void;
   onError: (msg: string) => void;
+  onUpgradeRequired?: () => void;
 }
 
 const LENGTH_OPTIONS: { value: SummaryLength; label: string; description: string }[] = [
@@ -17,7 +19,7 @@ const LENGTH_OPTIONS: { value: SummaryLength; label: string; description: string
   { value: "long", label: "Uzun", description: "3-4→1 cümle" },
 ];
 
-export function SummaryForm({ onResult, onError }: SummaryFormProps) {
+export function SummaryForm({ onResult, onError, onUpgradeRequired }: SummaryFormProps) {
   const [text, setText] = useState("");
   const [length, setLength] = useState<SummaryLength>("medium");
   const [loading, setLoading] = useState(false);
@@ -39,7 +41,11 @@ export function SummaryForm({ onResult, onError }: SummaryFormProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        onError(data.error || "Bir hata oluştu.");
+        if (res.status === 403 && onUpgradeRequired) {
+          onUpgradeRequired();
+        } else {
+          onError(data.error || "Bir hata oluştu.");
+        }
         return;
       }
 
@@ -99,6 +105,12 @@ export function SummaryForm({ onResult, onError }: SummaryFormProps) {
           )}
         </div>
       </div>
+
+      {/* File Upload */}
+      <FileUpload
+        onFileContent={(content) => setText(content)}
+        label="veya dilekçe dosyası yükleyin"
+      />
 
       {/* Length Selector */}
       <div className="flex items-center gap-2">

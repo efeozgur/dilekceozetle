@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
 import { comparePetitions } from "@/lib/deepseek";
+import { auth } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Kullanıcı girişi gereklidir. Lütfen giriş yapın veya kayıt olun." },
+        { status: 401 }
+      );
+    }
+
     const { text1, text2 } = await req.json();
 
     if (!text1 || typeof text1 !== "string" || !text2 || typeof text2 !== "string") {

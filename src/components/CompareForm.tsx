@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GitCompareArrows, Clipboard } from "lucide-react";
+import { FileUpload } from "./FileUpload";
 
 interface CompareFormProps {
   onResult: (result: string) => void;
@@ -29,7 +30,11 @@ export function CompareForm({ onResult, onError }: CompareFormProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        onError(data.error || "Bir hata oluştu.");
+        if (res.status === 401) {
+          onError("Karşılaştırma yapmak için giriş yapmalısınız.");
+        } else {
+          onError(data.error || "Bir hata oluştu.");
+        }
         return;
       }
 
@@ -59,59 +64,71 @@ export function CompareForm({ onResult, onError }: CompareFormProps) {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Text 1 */}
-        <div className="relative">
-          <label className="text-xs font-semibold text-muted-foreground mb-2 block">
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-muted-foreground block">
             Birinci Dilekçe
           </label>
-          <textarea
-            value={text1}
-            onChange={(e) => setText1(e.target.value)}
-            placeholder="Birinci dilekçe metnini buraya yapıştırın..."
-            className="w-full h-64 p-4 text-sm leading-relaxed border border-border rounded-2xl bg-muted/30 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 placeholder:text-muted-foreground/40 transition-all duration-200"
-            disabled={loading}
-          />
-          <div className="absolute bottom-3 right-3 flex items-center gap-2">
-            {text1.length > 0 && (
-              <span className="bg-white/80 backdrop-blur-sm border border-border text-xs text-muted-foreground px-2 py-1 rounded-lg">
-                {text1.length.toLocaleString("tr-TR")}
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={handlePaste1}
-              className="bg-white/80 backdrop-blur-sm border border-border p-1.5 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-            >
-              <Clipboard className="h-3.5 w-3.5 text-muted-foreground" />
-            </button>
+          <div className="relative">
+            <textarea
+              value={text1}
+              onChange={(e) => setText1(e.target.value)}
+              placeholder="Birinci dilekçe metnini buraya yapıştırın..."
+              className="w-full h-56 p-4 text-sm leading-relaxed border border-border rounded-2xl bg-muted/30 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 placeholder:text-muted-foreground/40 transition-all duration-200"
+              disabled={loading}
+            />
+            <div className="absolute bottom-3 right-3 flex items-center gap-2">
+              {text1.length > 0 && (
+                <span className="bg-white/80 backdrop-blur-sm border border-border text-xs text-muted-foreground px-2 py-1 rounded-lg">
+                  {text1.length.toLocaleString("tr-TR")}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={handlePaste1}
+                className="bg-white/80 backdrop-blur-sm border border-border p-1.5 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+              >
+                <Clipboard className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
           </div>
+          <FileUpload
+            onFileContent={(content) => setText1(content)}
+            label="veya dosya yükleyin"
+          />
         </div>
 
         {/* Text 2 */}
-        <div className="relative">
-          <label className="text-xs font-semibold text-muted-foreground mb-2 block">
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-muted-foreground block">
             İkinci Dilekçe
           </label>
-          <textarea
-            value={text2}
-            onChange={(e) => setText2(e.target.value)}
-            placeholder="İkinci dilekçe metnini buraya yapıştırın..."
-            className="w-full h-64 p-4 text-sm leading-relaxed border border-border rounded-2xl bg-muted/30 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 placeholder:text-muted-foreground/40 transition-all duration-200"
-            disabled={loading}
-          />
-          <div className="absolute bottom-3 right-3 flex items-center gap-2">
-            {text2.length > 0 && (
-              <span className="bg-white/80 backdrop-blur-sm border border-border text-xs text-muted-foreground px-2 py-1 rounded-lg">
-                {text2.length.toLocaleString("tr-TR")}
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={handlePaste2}
-              className="bg-white/80 backdrop-blur-sm border border-border p-1.5 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-            >
-              <Clipboard className="h-3.5 w-3.5 text-muted-foreground" />
-            </button>
+          <div className="relative">
+            <textarea
+              value={text2}
+              onChange={(e) => setText2(e.target.value)}
+              placeholder="İkinci dilekçe metnini buraya yapıştırın..."
+              className="w-full h-56 p-4 text-sm leading-relaxed border border-border rounded-2xl bg-muted/30 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 placeholder:text-muted-foreground/40 transition-all duration-200"
+              disabled={loading}
+            />
+            <div className="absolute bottom-3 right-3 flex items-center gap-2">
+              {text2.length > 0 && (
+                <span className="bg-white/80 backdrop-blur-sm border border-border text-xs text-muted-foreground px-2 py-1 rounded-lg">
+                  {text2.length.toLocaleString("tr-TR")}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={handlePaste2}
+                className="bg-white/80 backdrop-blur-sm border border-border p-1.5 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+              >
+                <Clipboard className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
           </div>
+          <FileUpload
+            onFileContent={(content) => setText2(content)}
+            label="veya dosya yükleyin"
+          />
         </div>
       </div>
 

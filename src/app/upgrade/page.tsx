@@ -1,13 +1,10 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getSystemSettings } from "@/lib/settings";
 import { ArrowLeft, Banknote, ShieldCheck, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { UpgradeForm } from "./UpgradeForm";
-
-const PRO_PRICE_TRY = 299;
-const IBAN_OWNER = process.env.IBAN_OWNER || "Özgür App";
-const IBAN_NUMBER = process.env.IBAN_NUMBER || "TR00 0000 0000 0000 0000 0000 00";
 
 export default async function UpgradePage() {
   const session = await auth();
@@ -15,7 +12,9 @@ export default async function UpgradePage() {
     redirect("/auth/login?callbackUrl=/upgrade");
   }
 
-  // Mevcut PENDING talep kontrolü
+  const settings = await getSystemSettings();
+  const proPrice = parseInt(settings.pro_price) || 299;
+
   const pending = await prisma.paymentRequest.findFirst({
     where: { userId: session.user.id, status: "PENDING" },
     select: {
@@ -26,26 +25,28 @@ export default async function UpgradePage() {
     },
   });
 
-  // Kullanıcı zaten Pro ise farklı mesaj göster
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: { subscription: true },
   });
   const isPro = user?.subscription === "pro";
 
+  if (isPro) {
+    redirect("/account");
+  }
+
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <Link
-          href="/pricing"
+          href="/dashboard"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6 cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
-          Fiyatlandırmaya dön
+          Dashboard&apos;a dön
         </Link>
 
         <div className="bg-white border border-border rounded-3xl shadow-lg overflow-hidden">
-          {/* Header */}
           <div className="bg-gradient-to-r from-gradient-start to-gradient-end px-8 py-6 text-white">
             <div className="flex items-center gap-3 mb-3">
               <Banknote className="h-5 w-5" />
@@ -56,115 +57,89 @@ export default async function UpgradePage() {
             </p>
           </div>
 
-          {/* Price */}
           <div className="px-8 py-5 border-b border-border bg-muted/20">
             <div className="flex items-baseline justify-center gap-1">
               <span className="text-4xl font-bold text-foreground">
-                {PRO_PRICE_TRY}
+                {proPrice}
               </span>
               <span className="text-muted-foreground">TL / ay</span>
             </div>
           </div>
 
-          {/* Zaten Pro */}
-          {isPro && (
-            <div className="px-8 py-6 bg-emerald-50 border-b border-emerald-200">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-emerald-900">
-                    Zaten Pro üyesiniz
-                  </p>
-                  <p className="text-xs text-emerald-700 mt-1">
-                    Pro özelliklerinin keyfini çıkarabilirsiniz.
-                  </p>
-                </div>
+          <div className="px-8 py-6 border-b border-border">
+            <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Banknote className="h-4 w-4" />
+              Ödeme Bilgileri
+            </h2>
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl p-5 space-y-3">
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Hesap Sahibi</p>
+                <p className="text-sm font-semibold text-foreground">
+                  {settings.iban_owner}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">IBAN</p>
+                <p className="text-base font-mono font-semibold text-foreground tracking-wide break-all">
+                  {settings.iban_number}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Tutar</p>
+                <p className="text-lg font-bold text-emerald-600">
+                  {proPrice} TL
+                </p>
               </div>
             </div>
-          )}
+            <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+              Lütfen IBAN&apos;a <strong>{proPrice} TL</strong> gönderdikten
+              sonra aşağıdaki formu doldurun. Ödemeniz onaylandığında Pro
+              üyeliğiniz otomatik olarak aktif edilecek.
+            </p>
+          </div>
 
-          {/* IBAN Kartı */}
-          {!isPro && (
-            <div className="px-8 py-6 border-b border-border">
-              <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                <Banknote className="h-4 w-4" />
-                Ödeme Bilgileri
-              </h2>
-              <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl p-5 space-y-3">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Hesap Sahibi</p>
-                  <p className="text-sm font-semibold text-foreground">
-                    {IBAN_OWNER}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">IBAN</p>
-                  <p className="text-base font-mono font-semibold text-foreground tracking-wide break-all">
-                    {IBAN_NUMBER}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Tutar</p>
-                  <p className="text-lg font-bold text-emerald-600">
-                    {PRO_PRICE_TRY} TL
-                  </p>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
-                Lütfen IBAN'a <strong>{PRO_PRICE_TRY} TL</strong> gönderdikten
-                sonra aşağıdaki formu doldurun. Ödemeniz onaylandığında Pro
-                üyeliğiniz otomatik olarak aktif edilecek.
-              </p>
-            </div>
-          )}
-
-          {/* Form / Pending Status */}
           <div className="px-8 py-6">
-            {isPro ? null : pending ? (
+            {pending ? (
               <PendingStatus
                 amount={pending.amountTry}
                 ibanLast4={pending.ibanLast4}
                 createdAt={pending.createdAt}
               />
             ) : (
-              <UpgradeForm expectedAmount={PRO_PRICE_TRY} />
+              <UpgradeForm expectedAmount={proPrice} />
             )}
           </div>
 
-          {/* Features */}
-          {!isPro && (
-            <div className="px-8 py-6 bg-muted/20 border-t border-border">
-              <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4" />
-                Pro özellikleri:
-              </h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                  Sınırsız özetleme
-                </li>
-                <li className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                  Kısa ve uzun özet seçenekleri
-                </li>
-                <li className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                  Dilekçe karşılaştırma
-                </li>
-                <li className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                  Özet geçmişi
-                </li>
-                <li className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                  Özel prompt şablonları
-                </li>
-              </ul>
-            </div>
-          )}
+          <div className="px-8 py-6 bg-muted/20 border-t border-border">
+            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4" />
+              Pro özellikleri:
+            </h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                Sınırsız özetleme
+              </li>
+              <li className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                Kısa ve uzun özet seçenekleri
+              </li>
+              <li className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                Dilekçe karşılaştırma
+              </li>
+              <li className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                Özet geçmişi
+              </li>
+              <li className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                Özel prompt şablonları
+              </li>
+            </ul>
+          </div>
         </div>
 
-        {/* Yardım */}
         <div className="mt-6 text-center text-xs text-muted-foreground">
           Sorularınız için{" "}
           <a
@@ -199,7 +174,7 @@ function PendingStatus({
               Talebiniz alındı, onay bekleniyor
             </p>
             <p className="text-xs text-amber-700 leading-relaxed">
-              Ödeme bildiriminiz admin'e iletildi. IBAN'a gönderdiğiniz tutar
+              Ödeme bildiriminiz admin&apos;e iletildi. IBAN&apos;a gönderdiğiniz tutar
               doğrulandıktan sonra Pro üyeliğiniz otomatik olarak aktif
               edilecek. Onay genellikle birkaç saat içinde gelir.
             </p>

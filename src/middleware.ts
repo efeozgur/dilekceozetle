@@ -9,6 +9,7 @@ export function middleware(req: NextRequest) {
 
   const isAuthPage = req.nextUrl.pathname.startsWith("/auth");
   const isDashboard = req.nextUrl.pathname.startsWith("/dashboard");
+  const isAdmin = req.nextUrl.pathname.startsWith("/admin");
 
   if (isAuthPage && isLoggedIn) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
@@ -18,9 +19,13 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
+  if (isAdmin && !isLoggedIn) {
+    return NextResponse.redirect(new URL("/auth/login", req.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/auth/:path*"],
+  matcher: ["/dashboard/:path*", "/auth/:path*", "/admin/:path*"],
 };

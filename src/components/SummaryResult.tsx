@@ -3,14 +3,23 @@
 import { Copy, Check, RotateCcw, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { SummaryStats, type SummaryStatsData } from "./stats/SummaryStats";
+import { ExportMenu } from "./ExportMenu";
 
 interface SummaryResultProps {
   text: string;
   stats: SummaryStatsData;
   onReset: () => void;
+  originalText?: string;
+  createdAt?: Date | string;
 }
 
-export function SummaryResult({ text, stats, onReset }: SummaryResultProps) {
+export function SummaryResult({
+  text,
+  stats,
+  onReset,
+  originalText = "",
+  createdAt,
+}: SummaryResultProps) {
   const [copied, setCopied] = useState(false);
   const [showStats, setShowStats] = useState(false);
 
@@ -50,7 +59,7 @@ export function SummaryResult({ text, stats, onReset }: SummaryResultProps) {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <button
           onClick={handleCopy}
           className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground border border-border px-5 py-2.5 rounded-xl hover:bg-muted transition-all duration-200 cursor-pointer"
@@ -67,6 +76,24 @@ export function SummaryResult({ text, stats, onReset }: SummaryResultProps) {
             </>
           )}
         </button>
+
+        {originalText && (
+          <ExportMenu
+            data={{
+              originalText,
+              resultText: text,
+              charCount: stats.charCount,
+              summaryCharCount: stats.summaryCharCount,
+              wordCount: stats.wordCount,
+              summaryWordCount: stats.summaryWordCount,
+              sentenceCount: stats.sentenceCount,
+              summarySentenceCount: stats.summarySentenceCount,
+              readingTime: stats.readingTime,
+              summaryReadingTime: stats.summaryReadingTime,
+              createdAt: createdAt || new Date(),
+            }}
+          />
+        )}
 
         <button
           onClick={onReset}
