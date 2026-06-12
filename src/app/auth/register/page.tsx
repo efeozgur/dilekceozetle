@@ -4,19 +4,35 @@ import Link from "next/link";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Scale, Loader2 } from "lucide-react";
+import { Scale, Loader2, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { motion } from "motion/react";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
+
+    // Client-side validation
+    const errors: { name?: string; email?: string; password?: string } = {};
+    if (!name.trim()) errors.name = "Ad Soyad gerekli";
+    if (!email.trim()) errors.email = "E-posta adresi gerekli";
+    if (!password) errors.password = "Şifre gerekli";
+    else if (password.length < 6) errors.password = "Şifre en az 6 karakter olmalıdır";
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -29,7 +45,7 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Kayit sirasinda bir hata olustu.");
+        setError(data.error || "Kayıt sırasında bir hata oluştu.");
         return;
       }
 
@@ -47,30 +63,50 @@ export default function RegisterPage() {
         router.refresh();
       }
     } catch {
-      setError("Kayit sirasinda bir hata olustu.");
+      setError("Kayıt sırasında bir hata oluştu.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 py-12">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 py-12"
+    >
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="text-center mb-8"
+        >
           <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-gradient-start to-gradient-end rounded-2xl mb-5 shadow-lg shadow-primary/20">
             <Scale className="h-7 w-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Kayit Ol</h1>
+          <h1 className="text-2xl font-bold text-foreground">Kayıt Ol</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Ucretsiz hesap olusturun ve hemen baslayin
+            Ücretsiz hesap oluşturun ve hemen başlayın
           </p>
-        </div>
+        </motion.div>
 
-        <div className="bg-white border border-border rounded-3xl shadow-sm p-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="bg-white border border-border rounded-3xl shadow-sm p-8"
+        >
           {error && (
-            <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-700 font-medium">
-              {error}
-            </div>
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="mb-5 p-4 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-700 font-medium flex items-start gap-3"
+            >
+              <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-red-500" />
+              <span>{error}</span>
+            </motion.div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -82,11 +118,21 @@ export default function RegisterPage() {
                 id="name"
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Adiniz Soyadiniz"
+                onChange={(e) => { setName(e.target.value); setFieldErrors((prev) => ({ ...prev, name: undefined })); }}
+                placeholder="Adınız Soyadınız"
                 required
-                className="w-full px-4 py-3 text-sm border border-border rounded-xl bg-muted/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all duration-200"
+                className={`w-full px-4 py-3 text-sm border rounded-xl bg-muted/30 focus:outline-none focus:ring-2 transition-all duration-200 ${
+                  fieldErrors.name
+                    ? "border-red-300 focus:ring-red-200 focus:border-red-400"
+                    : "border-border focus:ring-primary/20 focus:border-primary/40"
+                }`}
               />
+              {fieldErrors.name && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {fieldErrors.name}
+                </p>
+              )}
             </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
@@ -96,26 +142,62 @@ export default function RegisterPage() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); setFieldErrors((prev) => ({ ...prev, email: undefined })); }}
                 placeholder="ornek@email.com"
                 required
-                className="w-full px-4 py-3 text-sm border border-border rounded-xl bg-muted/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all duration-200"
+                className={`w-full px-4 py-3 text-sm border rounded-xl bg-muted/30 focus:outline-none focus:ring-2 transition-all duration-200 ${
+                  fieldErrors.email
+                    ? "border-red-300 focus:ring-red-200 focus:border-red-400"
+                    : "border-border focus:ring-primary/20 focus:border-primary/40"
+                }`}
               />
+              {fieldErrors.email && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
-                Sifre
+                Şifre
               </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                minLength={6}
-                className="w-full px-4 py-3 text-sm border border-border rounded-xl bg-muted/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all duration-200"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => { setPassword(e.target.value); setFieldErrors((prev) => ({ ...prev, password: undefined })); }}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  className={`w-full px-4 py-3 text-sm border rounded-xl bg-muted/30 focus:outline-none focus:ring-2 transition-all duration-200 pr-11 ${
+                    fieldErrors.password
+                      ? "border-red-300 focus:ring-red-200 focus:border-red-400"
+                      : "border-border focus:ring-primary/20 focus:border-primary/40"
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer p-1"
+                  tabIndex={-1}
+                  aria-label={showPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {fieldErrors.password && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {fieldErrors.password}
+                </p>
+              )}
+              {!fieldErrors.password && password.length === 0 && (
+                <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
+                  En az 6 karakter
+                </p>
+              )}
             </div>
             <button
               type="submit"
@@ -125,24 +207,27 @@ export default function RegisterPage() {
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Kayit yapiliyor...
+                  Kayıt yapılıyor...
                 </>
               ) : (
-                "Kayit Ol"
+                "Kayıt Ol"
               )}
             </button>
           </form>
+        </motion.div>
 
-
-        </div>
-
-        <p className="text-center text-sm text-muted-foreground mt-6">
-          Zaten hesabiniz var mi?{" "}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-center text-sm text-muted-foreground mt-6"
+        >
+          Zaten hesabınız var mı?{" "}
           <Link href="/auth/login" className="font-semibold text-primary hover:text-primary-dark transition-colors duration-200 cursor-pointer">
-            Giris Yap
+            Giriş Yap
           </Link>
-        </p>
+        </motion.p>
       </div>
-    </div>
+    </motion.div>
   );
 }

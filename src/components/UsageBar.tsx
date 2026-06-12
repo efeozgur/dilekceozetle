@@ -18,12 +18,28 @@ export function UsageBar({ used, total, subscription, compact = false }: UsageBa
 
   if (isPro) {
     return (
-      <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl px-5 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <Crown className="h-4 w-4 text-amber-600" />
-          <span className="text-sm font-semibold text-amber-800">Sınırsız Kullanım</span>
+      <div className="relative overflow-hidden bg-gradient-to-r from-amber-50 via-amber-100/50 to-orange-50 border border-amber-200 rounded-2xl px-5 py-3.5 flex items-center justify-between group">
+        <div
+          className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)",
+            backgroundSize: "200% 100%",
+            animation: "pro-card-shimmer 3s ease-in-out infinite",
+          }}
+        />
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="relative">
+            <Crown className="h-5 w-5 text-amber-600" style={{ animation: "pro-crown-glow 2s ease-in-out infinite" }} />
+          </div>
+          <div>
+            <span className="text-sm font-bold text-amber-800">Sınırsız Kullanım</span>
+            <p className="text-[10px] text-amber-600/80">Tüm Pro özelliklerine erişiminiz var</p>
+          </div>
         </div>
-        <span className="text-xs text-amber-600">Pro Üye</span>
+        <span className="relative z-10 inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50/80 border border-amber-200/60 px-2 py-1 rounded-lg shadow-sm">
+          <Crown className="h-3 w-3" />
+          PRO
+        </span>
       </div>
     );
   }

@@ -1,6 +1,6 @@
 # Dilekçe Özetle - Proje Geliştirme Notları
 
-**Son güncelleme:** 2026-06-11
+**Son güncelleme:** 2026-06-12 (Pro UI premium iyileştirmeleri + PDF Türkçe karakter fix)
 **Repo:** https://github.com/efeozgur/dilekceozetle
 **Stack:** Next.js 16.2.9 (Turbopack) · React 19 · Prisma + SQLite · NextAuth 5 · DeepSeek AI · Tailwind CSS
 
@@ -41,10 +41,12 @@ Türk hukuk sistemine yönelik bir SaaS uygulamasıdır. Kullanıcılar dilekçe
 ### 3.1. Güvenlik
 - Şifreler `bcryptjs` ile hash'leniyor
 - `auth.ts` → `trustHost: true` (production için gerekli)
-- `middleware.ts` → Hem `__Secure-authjs.session-token` hem `authjs.session-token` kontrolü
+- `middleware.ts` → Cookie tabanlı kontrol, `/auth/*` sayfalarına redirect yok (kullanıcı her zaman login/register sayfasına erişebilir)
+- `.env.local` → Local development için `AUTH_URL=http://localhost:3000` (gitignored)
 
 ### 3.2. Kullanım Kontrol Sistemi
-- **Kayıtsız kullanım yasak:** `/api/summarize` ve `/api/compare` 401 döndürür
+- **Kayıtsız kullanım:** Ana sayfada form yerine login prompt gösterilir (`src/app/page.tsx`)
+- **API koruması:** `/api/summarize` ve `/api/compare` 401 döndürür
 - **Free kullanıcılar:** Toplam 5 özet, sadece "orta" uzunluk
 - **Pro kullanıcılar:** Sınırsız özet, tüm uzunluklar
 - **Limit dolduğunda:** Blur arka planlı UpgradeModal gösterilir
@@ -130,19 +132,54 @@ Tek kullanıcı admin sistemi (`ADMIN_EMAIL` env var).
 - `SummaryResult.tsx`: İstatistikler collapsible, gradient arka plan, "ÖZET" badge
 - `Header.tsx`: Pro kullanıcılar için "Fiyatlandırma" gizli, admin linki, hesabım linki
 - Ana sayfa CTA: "Ücretsiz başlayın, hemen kayıt olun"
+- `ProActivatedOverlay.tsx`: Ödeme onayı sonrası 1 kez gösterilen tam ekran kutlama animasyonu — kral tacı SVG + 16 yıldız parçacığı + genişleyen halkalar + shimmer + glow efekti, 4 sn sonra auto-close, sessionStorage ile tekrar göstermeme
+- Ana sayfa giriş kontrolü: Session yoksa form yerine "Giriş Yap / Kayıt Ol" prompt'u
 
 ### 3.10. DOMMatrix Hatası Düzeltmesi
 - `pdfjs-dist` static import DOMMatrix hatası veriyordu
 - Çözüm: `src/lib/fileParser.ts`'de dynamic import (`await import("pdfjs-dist")`)
 
+### 3.11. Pro UI Premium İyileştirmeleri
+Pro kullanıcıların arayüzde premium hissini alması için yapılan görsel iyileştirmeler:
+
+| Bileşen | Değişiklik |
+|---------|-----------|
+| `Header.tsx` | Avatar üzerinde crown badge + "PRO" etiketi, amber border glow |
+| `UsageBar.tsx` | Shimmer animasyonlu gradient banner, crown glow, "PRO" badge |
+| `page.tsx` (Home) | Pro kullanıcıya amber border glow kart, "PRO" badge ve bilgi satırı |
+| `SummaryForm.tsx` | Textarea amber focus ring, amber gradient length selector, amber "Özetle" butonu |
+| `dashboard/page.tsx` | Özet kartlarında amber border, her kartta "PRO" badge |
+| `account/page.tsx` | Animasyonlu hareketli gradient kart, premium istatistik kutuları, pulse badge |
+| `FileUpload.tsx` | Amber border glow drag efekti |
+| `ExportMenu.tsx` | Amber temalı dropdown menü |
+| `globals.css` | Yeni animasyonlar: `pro-gradient-flow`, `pro-crown-glow`, `pro-card-shimmer`, `pro-border-glow`, `pro-badge-pulse`, `pro-upload-glow` |
+
+### 3.12. PDF Export Türkçe Karakter Desteği
+- **Sorun:** `turkishToAscii` fonksiyonu `ş`→`s`, `ı`→`i` dönüşümü yapıyor, "sık sık" → "sik sik" gibi anlam bozulmalarına yol açıyordu
+- **Çözüm:**
+  - `turkishToAscii` fonksiyonu tamamen silindi
+  - `public/fonts/NotoSans-Regular.ttf` eklendi (GitHub'dan indirilen orijinal Noto Sans TTF)
+  - `loadUnicodeFont` güncellendi: önce yerel font dene, sonra CDN, en son Helvetica
+  - Helvetica fallback'te dahi Türkçe karakterler olduğu gibi gönderilir (kutucuk çıksa bile yanlış kelime olmaz)
+  - Font uyarı mesajı kaldırıldı
+
 ---
 
-## 4. Deploy Süreci (Sunucu: 45.94.169.47)
+## 4. Deploy & Local Dev
 
+## 4. Deploy & Local Dev
+
+### Production (Sunucu: 45.94.169.47)
 - **URL:** https://dilekceozet.ozgurapp.com
 - **PM2:** `dilekceozet`, port 3005
 - **Nginx:** Reverse proxy → 3005
 - **Database:** SQLite `/var/www/dilekceozet/prisma/dev.db`
+- **Env:** Production ortam değişkenleri sunucuda `.env` veya platform env vars ile set edilir
+
+### Local Development
+- `.env` → Production URL'leri (gitignored, sadece sunucuda kullanılır)
+- `.env.local` → Local override: `AUTH_URL=http://localhost:3000` (gitignored, `.env.local` > `.env` override eder)
+- **Önemli:** `.env*` gitignored, push edilmez. Sunucu kendi env değişkenlerini kullanır.
 
 ---
 
@@ -150,9 +187,11 @@ Tek kullanıcı admin sistemi (`ADMIN_EMAIL` env var).
 
 - Shopier entegrasyonu askıda (API key/secret bekleniyor)
 - `payment/page.tsx` Pro feature listesinde tutarsızlık olabilir
-- `.env.example` yok
 - Rate limiting yok
 - Compare sonuçları DB'ye kaydedilmiyor
+- Register API validasyonu eksik (email format + min length kontrolü yok)
+- Production loglama (Sentry/LogRocket) yok
+- Stale session cookie temizleme — middleware cookie geçerliliğini kontrol etmiyor (sadece varlığına bakar)
 
 ---
 
@@ -160,7 +199,7 @@ Tek kullanıcı admin sistemi (`ADMIN_EMAIL` env var).
 
 1. Shopier entegrasyonu çözümü
 2. Rate limiting (özellikle `/api/summarize`)
-3. `.env.example` oluştur
-4. Compare sonuçlarını DB'ye kaydet
-5. Register API validasyonu (email format + min length)
-6. Production loglama (Sentry/LogRocket)
+3. Compare sonuçlarını DB'ye kaydet
+4. Register API validasyonu (email format + min length)
+5. Production loglama (Sentry/LogRocket)
+6. Middleware'de JWT validasyonu (stale cookie sorunu için)

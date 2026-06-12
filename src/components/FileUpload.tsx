@@ -115,11 +115,12 @@ export function FileUpload({
         onClick={() => !loading && inputRef.current?.click()}
         className={`relative border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 ${
           isDragging
-            ? "border-primary bg-primary/5"
+            ? "border-amber-400 bg-amber-50/50"
             : fileName
             ? "border-emerald-300 bg-emerald-50/50"
-            : "border-border hover:border-primary/30 hover:bg-muted/50"
+            : "border-border hover:border-amber-300/40 hover:bg-amber-50/30"
         } ${loading ? "pointer-events-none opacity-70" : ""}`}
+        style={isDragging && isPro ? { animation: "pro-upload-glow 0.8s ease-in-out infinite" } : {}}
       >
         <input
           ref={inputRef}

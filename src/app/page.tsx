@@ -7,8 +7,9 @@ import { SummaryResult } from "@/components/SummaryResult";
 import { ErrorDisplay } from "@/components/ErrorDisplay";
 import { UpgradeModal } from "@/components/UpgradeModal";
 import { UsageBar } from "@/components/UsageBar";
-import { Scale, Shield, Zap, FileText, ArrowRight, Sparkles, Clock, Brain } from "lucide-react";
+import { Scale, Shield, Zap, FileText, ArrowRight, Sparkles, Clock, Brain, LogIn, ClipboardPaste, FileCheck, Crown } from "lucide-react";
 import type { SummaryStatsData } from "@/components/stats/SummaryStats";
+import { motion } from "motion/react";
 
 type ViewState = "form" | "result" | "error";
 
@@ -82,48 +83,173 @@ export default function Home() {
       </div>
 
       {/* Main Card */}
-      <div className="bg-white border border-border rounded-3xl shadow-sm shadow-border/50 p-6 sm:p-8 mb-14">
-        {/* Kullanım Göstergesi */}
-        {session && subscription === "free" && !isAdmin && (
-          <div className="mb-5">
-            <UsageBar
-              used={totalSummaries}
-              total={5}
-              subscription={subscription}
-              compact
-            />
+      <div className={`bg-white border rounded-3xl shadow-sm p-6 sm:p-8 mb-14 transition-all duration-500 ${
+        subscription === "pro"
+          ? "border-amber-200/60 shadow-amber-200/20"
+          : "border-border shadow-border/50"
+      }`}>
+        {subscription === "pro" && (
+          <div className="flex items-center gap-2 mb-4 pb-4 border-b border-amber-100">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg">
+              <Crown className="h-3 w-3" />
+              PRO
+            </div>
+            <span className="text-xs text-amber-600/80">Sınırsız özetleme ve tüm özellikler aktif</span>
           </div>
         )}
-
-        {view === "form" && (
-          <SummaryForm
-            onResult={handleResult}
-            onError={handleError}
-            onUpgradeRequired={() => setShowUpgradeModal(true)}
-          />
-        )}
-
-        {view === "result" && resultData && (
-          <SummaryResult
-            text={resultData.summary}
-            stats={resultData.stats}
-            onReset={handleReset}
-          />
-        )}
-
-        {view === "error" && (
-          <div className="space-y-4">
-            <ErrorDisplay message={error} onDismiss={handleReset} />
-            <SummaryForm
-              onResult={handleResult}
-              onError={handleError}
-              onUpgradeRequired={() => setShowUpgradeModal(true)}
-            />
+        {!session ? (
+          /* Giriş yapılmamışsa login prompt */
+          <div className="text-center py-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl mb-5">
+              <LogIn className="h-7 w-7 text-primary" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-2">Özetleme yapmak için giriş yapın</h2>
+            <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+              Ücretsiz hesap oluşturarak 5 özet hakkınızı kullanın veya Pro plana yükselterek sınırsız özetleme yapın.
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <a
+                href="/auth/login"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-gradient-start to-gradient-end text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:shadow-lg hover:shadow-primary/25 transition-all duration-300"
+              >
+                <LogIn className="h-4 w-4" />
+                Giriş Yap
+              </a>
+              <a
+                href="/auth/register"
+                className="inline-flex items-center gap-2 border border-border text-foreground px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-muted transition-all duration-300"
+              >
+                Kayıt Ol
+              </a>
+            </div>
           </div>
+        ) : (
+          <>
+            {/* Kullanım Göstergesi */}
+            {!isAdmin && (
+              <div className="mb-5">
+                <UsageBar
+                  used={totalSummaries}
+                  total={5}
+                  subscription={subscription}
+                  compact={subscription !== "pro"}
+                />
+              </div>
+            )}
+
+            {view === "form" && (
+              <SummaryForm
+                onResult={handleResult}
+                onError={handleError}
+                onUpgradeRequired={() => setShowUpgradeModal(true)}
+              />
+            )}
+
+            {view === "result" && resultData && (
+              <SummaryResult
+                text={resultData.summary}
+                stats={resultData.stats}
+                onReset={handleReset}
+              />
+            )}
+
+            {view === "error" && (
+              <div className="space-y-4">
+                <ErrorDisplay message={error} onDismiss={handleReset} />
+                <SummaryForm
+                  onResult={handleResult}
+                  onError={handleError}
+                  onUpgradeRequired={() => setShowUpgradeModal(true)}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
 
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+
+      {/* Nasıl Çalışır Section */}
+      <div className="mb-16">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 bg-primary/5 border border-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-semibold mb-4 tracking-wide uppercase">
+            <Sparkles className="h-3.5 w-3.5" />
+            Kullanım
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            Nasıl <span className="bg-gradient-to-r from-gradient-start to-gradient-end bg-clip-text text-transparent">Çalışır</span>
+          </h2>
+          <p className="text-muted-foreground max-w-xl mx-auto text-sm mt-2">
+            Üç basit adımda dilekçenizi özetleyin
+          </p>
+        </div>
+
+        <div className="relative grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          {/* Timeline line (desktop) */}
+          <div className="hidden md:block absolute top-12 left-[calc(16.67%+2rem)] right-[calc(16.67%+2rem)] h-0.5 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20" />
+
+          {/* Step 1 */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0 }}
+            className="relative flex flex-col items-center text-center"
+          >
+            <div className="relative z-10 flex items-center justify-center w-14 h-14 bg-gradient-to-br from-gradient-start to-gradient-end rounded-2xl mb-5 shadow-lg shadow-primary/25">
+              <ClipboardPaste className="h-6 w-6 text-white" />
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-white border-2 border-primary rounded-full flex items-center justify-center">
+                <span className="text-[11px] font-bold text-primary">1</span>
+              </div>
+            </div>
+            <div className="hidden md:block absolute top-7 left-[calc(50%+3rem)] w-[calc(100%-3rem)] h-0.5 bg-gradient-to-r from-primary/30 to-transparent" />
+            <h3 className="font-semibold text-foreground mb-2">Metni Yapıştır</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
+              Dilekçe metnini kutuya yapıştırın veya PDF/UDF dosyası yükleyin. 100.000 karaktere kadar destekliyoruz.
+            </p>
+          </motion.div>
+
+          {/* Step 2 */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="relative flex flex-col items-center text-center"
+          >
+            <div className="relative z-10 flex items-center justify-center w-14 h-14 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl mb-5 shadow-lg shadow-violet-500/25">
+              <Brain className="h-6 w-6 text-white" />
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-white border-2 border-violet-500 rounded-full flex items-center justify-center">
+                <span className="text-[11px] font-bold text-violet-600">2</span>
+              </div>
+            </div>
+            <h3 className="font-semibold text-foreground mb-2">Yapay Zeka Analiz Etsin</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
+              Gelişmiş yapay zeka motorumuz metni tarar, ana noktaları belirler ve nesnel bir özet çıkarır.
+            </p>
+          </motion.div>
+
+          {/* Step 3 */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="relative flex flex-col items-center text-center"
+          >
+            <div className="relative z-10 flex items-center justify-center w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl mb-5 shadow-lg shadow-emerald-500/25">
+              <FileCheck className="h-6 w-6 text-white" />
+              <div className="absolute -top-1 -right-1 w-6 h-6 bg-white border-2 border-emerald-500 rounded-full flex items-center justify-center">
+                <span className="text-[11px] font-bold text-emerald-600">3</span>
+              </div>
+            </div>
+            <h3 className="font-semibold text-foreground mb-2">Özeti Al</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
+              Kısa, yoğun ve nesnel özeti saniyeler içinde alın. İsterseniz PDF veya UDF olarak dışa aktarın.
+            </p>
+          </motion.div>
+        </div>
+      </div>
 
       {/* Features Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

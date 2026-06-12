@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Sparkles, Clipboard } from "lucide-react";
+import { FileText, Sparkles, Clipboard, Crown } from "lucide-react";
 import type { SummaryStatsData } from "./stats/SummaryStats";
 import type { SummaryLength } from "@/lib/prompts";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { FileUpload } from "./FileUpload";
+import { useSession } from "next-auth/react";
+import { motion, AnimatePresence } from "motion/react";
 
 interface SummaryFormProps {
   onResult: (data: { summary: string; stats: SummaryStatsData }) => void;
@@ -20,6 +22,8 @@ const LENGTH_OPTIONS: { value: SummaryLength; label: string; description: string
 ];
 
 export function SummaryForm({ onResult, onError, onUpgradeRequired }: SummaryFormProps) {
+  const { data: session } = useSession();
+  const isPro = session?.user?.subscription === "pro";
   const [text, setText] = useState("");
   const [length, setLength] = useState<SummaryLength>("medium");
   const [loading, setLoading] = useState(false);
@@ -93,8 +97,12 @@ export function SummaryForm({ onResult, onError, onUpgradeRequired }: SummaryFor
           id="petition-text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Dilekçe metnini buraya yapıştırın..."
-          className="w-full h-72 p-5 text-sm leading-relaxed border border-border rounded-2xl bg-muted/30 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 placeholder:text-muted-foreground/40 transition-all duration-200"
+          placeholder="Dilekçe metnini buraya yapıştırın veya aşağıdan dosya yükleyin. Ne kadar uzun metin girerseniz özet o kadar başarılı olur..."
+          className={`w-full h-72 p-5 text-sm leading-relaxed border rounded-2xl bg-muted/30 resize-none focus:outline-none focus:ring-2 placeholder:text-muted-foreground/40 transition-all duration-200 ${
+            isPro
+              ? "border-amber-200/60 focus:ring-amber-200/30 focus:border-amber-300/50"
+              : "border-border focus:ring-primary/20 focus:border-primary/40"
+          }`}
           disabled={loading}
         />
         <div className="absolute bottom-4 right-4 flex items-center gap-2">
@@ -116,18 +124,33 @@ export function SummaryForm({ onResult, onError, onUpgradeRequired }: SummaryFor
       <div className="flex items-center gap-2">
         <span className="text-xs font-medium text-muted-foreground mr-1">Özet Uzunluğu:</span>
         {LENGTH_OPTIONS.map((opt) => (
-          <button
+          <motion.button
             key={opt.value}
             type="button"
             onClick={() => setLength(opt.value)}
-            className={`px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer ${
+            whileTap={{ scale: 0.95 }}
+            className={`relative px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer ${
               length === opt.value
-                ? "bg-gradient-to-r from-gradient-start to-gradient-end text-white shadow-sm shadow-primary/25"
+                ? isPro
+                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm shadow-amber-500/25"
+                  : "bg-gradient-to-r from-gradient-start to-gradient-end text-white shadow-sm shadow-primary/25"
                 : "border border-border text-muted-foreground hover:text-foreground hover:bg-muted"
             }`}
           >
-            {opt.label}
-          </button>
+            {length === opt.value && (
+              <motion.div
+                layoutId="lengthIndicator"
+                className={`absolute inset-0 rounded-xl ${
+                  isPro
+                    ? "bg-gradient-to-r from-amber-500 to-orange-500"
+                    : "bg-gradient-to-r from-gradient-start to-gradient-end"
+                }`}
+                style={{ zIndex: -1 }}
+                transition={{ type: "spring", duration: 0.4, bounce: 0.2 }}
+              />
+            )}
+            <span className="relative z-10">{opt.label}</span>
+          </motion.button>
         ))}
       </div>
 
@@ -150,7 +173,11 @@ export function SummaryForm({ onResult, onError, onUpgradeRequired }: SummaryFor
         <button
           type="submit"
           disabled={!text.trim() || loading}
-          className="flex items-center gap-2 bg-gradient-to-r from-gradient-start to-gradient-end text-white px-7 py-2.5 rounded-xl text-sm font-semibold hover:shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-300 cursor-pointer"
+          className={`flex items-center gap-2 text-white px-7 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-300 cursor-pointer ${
+            isPro
+              ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-lg hover:shadow-amber-500/25"
+              : "bg-gradient-to-r from-gradient-start to-gradient-end hover:shadow-lg hover:shadow-primary/25"
+          }`}
         >
           <Sparkles className="h-4 w-4" />
           Özetle

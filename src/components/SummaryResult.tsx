@@ -1,9 +1,10 @@
 "use client";
 
-import { Copy, Check, RotateCcw, FileText, ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { Copy, Check, RotateCcw, FileText, ChevronDown, ChevronUp, BarChart3 } from "lucide-react";
+import { useState, useCallback } from "react";
 import { SummaryStats, type SummaryStatsData } from "./stats/SummaryStats";
 import { ExportMenu } from "./ExportMenu";
+import { Toast } from "./Toast";
 
 interface SummaryResultProps {
   text: string;
@@ -21,13 +22,17 @@ export function SummaryResult({
   createdAt,
 }: SummaryResultProps) {
   const [copied, setCopied] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [showStats, setShowStats] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(text);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    setShowToast(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  }, [text]);
 
   return (
     <div className="space-y-6">
@@ -115,7 +120,8 @@ export function SummaryResult({
           ) : (
             <ChevronDown className="h-4 w-4" />
           )}
-          📊 İstatistikleri {showStats ? "Gizle" : "Göster"}
+          <BarChart3 className="h-4 w-4" />
+          İstatistikleri {showStats ? "Gizle" : "Göster"}
         </button>
         {showStats && (
           <div className="mt-4">
@@ -123,6 +129,16 @@ export function SummaryResult({
           </div>
         )}
       </div>
+
+      {/* Toast feedback */}
+      {showToast && (
+        <Toast
+          message="Özet panoya kopyalandı!"
+          type="success"
+          onClose={() => setShowToast(false)}
+          duration={2000}
+        />
+      )}
     </div>
   );
 }

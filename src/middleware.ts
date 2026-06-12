@@ -2,24 +2,16 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const sessionToken =
+  const token =
     req.cookies.get("__Secure-authjs.session-token")?.value ||
     req.cookies.get("authjs.session-token")?.value;
-  const isLoggedIn = !!sessionToken;
 
-  const isAuthPage = req.nextUrl.pathname.startsWith("/auth");
+  const isLoggedIn = !!token;
   const isDashboard = req.nextUrl.pathname.startsWith("/dashboard");
   const isAdmin = req.nextUrl.pathname.startsWith("/admin");
 
-  if (isAuthPage && isLoggedIn) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
-
-  if (isDashboard && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
-  }
-
-  if (isAdmin && !isLoggedIn) {
+  // Dashboard/admin'e giriş yapılmamışsa login'e yönlendir
+  if ((isDashboard || isAdmin) && !isLoggedIn) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
@@ -27,5 +19,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/auth/:path*", "/admin/:path*"],
+  matcher: ["/dashboard/:path*", "/admin/:path*"],
 };

@@ -51,12 +51,36 @@ export async function parsePDF(file: File): Promise<string> {
     fullText += pageText + "\n\n";
   }
 
-  const cleaned = fullText.trim();
+  const cleaned = cleanText(fullText.trim());
   if (!cleaned) {
     throw new FileParseError("PDF dosyasından metin çıkarılamadı. Lütfen metin içeren bir PDF yükleyin.");
   }
 
   return cleaned;
+}
+
+/**
+ * ANSI escape kodlarını, kontrol karakterlerini ve bozuk encoding
+ * artifact'larını temizler. Türkçe karakterlerin düzgün kalmasını sağlar.
+ */
+function cleanText(text: string): string {
+  return (
+    text
+      // ANSI escape sequence'lerini temizle: ESC[... (ör: ESC[97;5u, ESC[45:95:61;6u)
+      .replace(/\x1B\[[\d;:]+[a-zA-Z~_]/g, "")
+      // Diğer ESC seqeunce'leri
+      .replace(/\x1B[\[\]()][\d;]*[a-zA-Z]/g, "")
+      // C0 kontrol karakterlerini temizle (null, bell, backspace, vb.)
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "")
+      // Birden fazla ardışık boşluğu teke indir
+      .replace(/ {2,}/g, " ")
+      // Satır başı karakterlerini temizle
+      .replace(/\r\n/g, "\n")
+      .replace(/\r/g, "\n")
+      // Üçten fazla ardışık newline'ı ikiye indir
+      .replace(/\n{3,}/g, "\n\n")
+      .trim()
+  );
 }
 
 export async function parseUDF(file: File): Promise<string> {
@@ -73,11 +97,12 @@ export async function parseUDF(file: File): Promise<string> {
   const xmlText = await contentXml.async("string");
   const text = extractTextFromXml(xmlText);
 
-  if (!text.trim()) {
+  const cleaned = cleanText(text.trim());
+  if (!cleaned) {
     throw new FileParseError("UDF dosyasından metin çıkarılamadı.");
   }
 
-  return text.trim();
+  return cleaned;
 }
 
 function extractTextFromXml(xml: string): string {

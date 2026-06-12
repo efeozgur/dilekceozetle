@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { GitCompareArrows, Clipboard } from "lucide-react";
 import { FileUpload } from "./FileUpload";
+import { LoadingOverlay } from "./LoadingOverlay";
 
 interface CompareFormProps {
   onResult: (result: string) => void;
@@ -60,9 +61,20 @@ export function CompareForm({ onResult, onError }: CompareFormProps) {
     } catch {}
   };
 
+  if (loading) {
+    return <LoadingOverlay />;
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* VS Badge - visible on md+ */}
+        <div className="hidden md:flex absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2 z-10">
+          <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-gradient-start to-gradient-end rounded-xl shadow-lg shadow-primary/30 text-white text-sm font-bold tracking-wide ring-4 ring-white">
+            VS
+          </div>
+        </div>
+
         {/* Text 1 */}
         <div className="space-y-2">
           <label className="text-xs font-semibold text-muted-foreground block">
@@ -98,7 +110,13 @@ export function CompareForm({ onResult, onError }: CompareFormProps) {
         </div>
 
         {/* Text 2 */}
-        <div className="space-y-2">
+        <div className="space-y-2 relative">
+          {/* VS Badge - mobile */}
+          <div className="flex md:hidden items-center justify-center my-2">
+            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-gradient-start to-gradient-end rounded-xl shadow-md shadow-primary/20 text-white text-xs font-bold tracking-wide">
+              VS
+            </div>
+          </div>
           <label className="text-xs font-semibold text-muted-foreground block">
             İkinci Dilekçe
           </label>
