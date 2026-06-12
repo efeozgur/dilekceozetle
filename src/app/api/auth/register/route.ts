@@ -13,9 +13,23 @@ export async function POST(req: Request) {
       );
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json(
+        { error: "Geçerli bir e-posta adresi giriniz." },
+        { status: 400 }
+      );
+    }
+
     if (password.length < 6) {
       return NextResponse.json(
         { error: "Şifre en az 6 karakter olmalıdır." },
+        { status: 400 }
+      );
+    }
+
+    if (!name || !name.trim()) {
+      return NextResponse.json(
+        { error: "Ad Soyad gereklidir." },
         { status: 400 }
       );
     }
@@ -34,7 +48,7 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = await prisma.user.create({
       data: {
-        name,
+        name: name.trim(),
         email,
         passwordHash: hashedPassword,
       },

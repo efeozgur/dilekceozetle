@@ -28,14 +28,14 @@ export function FileUpload({
 
   if (!isPro) {
     return (
-      <div className="border-2 border-dashed border-border rounded-2xl p-6 text-center bg-muted/30">
-        <FileText className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
-        <p className="text-sm text-muted-foreground mb-2">
+      <div className="border border-dashed border-border rounded-xl p-4 text-center bg-muted/20">
+        <FileText className="h-6 w-6 text-muted-foreground/30 mx-auto mb-2" />
+        <p className="text-xs text-muted-foreground mb-2">
           Dosya yükleme Pro özelliği
         </p>
         <Link
           href="/upgrade"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary-dark bg-primary/5 border border-primary/20 px-3 py-1.5 rounded-xl hover:bg-primary/10 transition-all"
+          className="inline-flex items-center gap-1 text-[11px] font-medium text-primary hover:text-primary-dark bg-primary/5 border border-primary/15 px-2.5 py-1 rounded-lg hover:bg-primary/10 transition-all"
         >
           Pro&apos;ya Yükselt
         </Link>
@@ -107,20 +107,19 @@ export function FileUpload({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1.5">
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onClick={() => !loading && inputRef.current?.click()}
-        className={`relative border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 ${
+        className={`border border-dashed rounded-xl p-4 text-center cursor-pointer transition-all duration-200 ${
           isDragging
-            ? "border-amber-400 bg-amber-50/50"
+            ? "border-primary/50 bg-primary/5"
             : fileName
-            ? "border-emerald-300 bg-emerald-50/50"
-            : "border-border hover:border-amber-300/40 hover:bg-amber-50/30"
-        } ${loading ? "pointer-events-none opacity-70" : ""}`}
-        style={isDragging && isPro ? { animation: "pro-upload-glow 0.8s ease-in-out infinite" } : {}}
+            ? "border-emerald-300 bg-emerald-50/30"
+            : "border-border hover:border-primary/30 hover:bg-primary/3"
+        } ${loading ? "pointer-events-none opacity-60" : ""}`}
       >
         <input
           ref={inputRef}
@@ -131,37 +130,37 @@ export function FileUpload({
         />
 
         {loading ? (
-          <div className="flex flex-col items-center gap-2">
-            <Loader2 className="h-8 w-8 text-primary animate-spin" />
-            <p className="text-sm text-muted-foreground">Dosya işleniyor...</p>
+          <div className="flex flex-col items-center gap-1.5">
+            <Loader2 className="h-6 w-6 text-primary animate-spin" />
+            <p className="text-xs text-muted-foreground">Dosya işleniyor...</p>
           </div>
         ) : fileName ? (
-          <div className="flex items-center justify-center gap-3">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center gap-1.5">
               {fileName.endsWith(".pdf") ? (
-                <FileText className="h-6 w-6 text-red-500" />
+                <FileText className="h-4 w-4 text-red-500" />
               ) : (
-                <File className="h-6 w-6 text-blue-500" />
+                <File className="h-4 w-4 text-blue-500" />
               )}
-              <span className="text-sm font-medium text-foreground">{fileName}</span>
+              <span className="text-xs font-medium text-foreground">{fileName}</span>
             </div>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 clearFile();
               }}
-              className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+              className="p-0.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </button>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2">
-            <Upload className="h-8 w-8 text-muted-foreground/40" />
+          <div className="flex flex-col items-center gap-1">
+            <Upload className="h-5 w-5 text-muted-foreground/30" />
             <div>
-              <p className="text-sm font-medium text-foreground">{label}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                PDF veya UDF dosyası (maks. 5MB)
+              <p className="text-xs font-medium text-muted-foreground">{label}</p>
+              <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+                PDF veya UDF (maks. 5MB)
               </p>
             </div>
           </div>
@@ -169,8 +168,8 @@ export function FileUpload({
       </div>
 
       {error && (
-        <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-3">
-          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-1.5 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5">
+          <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
       )}

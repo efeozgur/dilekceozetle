@@ -10,6 +10,8 @@ interface CompareFormProps {
   onError: (msg: string) => void;
 }
 
+const MAX_CHARS = 100000;
+
 export function CompareForm({ onResult, onError }: CompareFormProps) {
   const [text1, setText1] = useState("");
   const [text2, setText2] = useState("");
@@ -18,6 +20,11 @@ export function CompareForm({ onResult, onError }: CompareFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!text1.trim() || !text2.trim() || loading) return;
+
+    if (text1.length > MAX_CHARS || text2.length > MAX_CHARS) {
+      onError(`Her bir metin en fazla ${MAX_CHARS.toLocaleString("tr-TR")} karakter olabilir.`);
+      return;
+    }
 
     setLoading(true);
 
@@ -66,40 +73,42 @@ export function CompareForm({ onResult, onError }: CompareFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* VS Badge - visible on md+ */}
         <div className="hidden md:flex absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2 z-10">
-          <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-gradient-start to-gradient-end rounded-xl shadow-lg shadow-primary/30 text-white text-sm font-bold tracking-wide ring-4 ring-white">
+          <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-gradient-start to-gradient-end rounded-xl shadow-md shadow-primary/20 text-white text-xs font-bold ring-4 ring-white">
             VS
           </div>
         </div>
 
-        {/* Text 1 */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-muted-foreground block">
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide block">
             Birinci Dilekçe
           </label>
           <div className="relative">
             <textarea
               value={text1}
               onChange={(e) => setText1(e.target.value)}
-              placeholder="Birinci dilekçe metnini buraya yapıştırın..."
-              className="w-full h-56 p-4 text-sm leading-relaxed border border-border rounded-2xl bg-muted/30 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 placeholder:text-muted-foreground/40 transition-all duration-200"
+              placeholder="Birinci dilekçe metnini yapıştırın..."
+              className="w-full h-52 p-3.5 text-sm leading-relaxed border border-border rounded-xl bg-muted/20 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 placeholder:text-muted-foreground/40 transition-all duration-200"
               disabled={loading}
             />
-            <div className="absolute bottom-3 right-3 flex items-center gap-2">
+            <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5">
               {text1.length > 0 && (
-                <span className="bg-white/80 backdrop-blur-sm border border-border text-xs text-muted-foreground px-2 py-1 rounded-lg">
+                <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                  text1.length > MAX_CHARS
+                    ? "text-red-600 bg-red-50 border-red-200"
+                    : "text-muted-foreground bg-white/90 border-border"
+                }`}>
                   {text1.length.toLocaleString("tr-TR")}
                 </span>
               )}
               <button
                 type="button"
                 onClick={handlePaste1}
-                className="bg-white/80 backdrop-blur-sm border border-border p-1.5 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                className="bg-white/90 border border-border p-1 rounded-md hover:bg-muted transition-colors cursor-pointer"
               >
-                <Clipboard className="h-3.5 w-3.5 text-muted-foreground" />
+                <Clipboard className="h-3 w-3 text-muted-foreground" />
               </button>
             </div>
           </div>
@@ -109,37 +118,39 @@ export function CompareForm({ onResult, onError }: CompareFormProps) {
           />
         </div>
 
-        {/* Text 2 */}
-        <div className="space-y-2 relative">
-          {/* VS Badge - mobile */}
-          <div className="flex md:hidden items-center justify-center my-2">
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-gradient-start to-gradient-end rounded-xl shadow-md shadow-primary/20 text-white text-xs font-bold tracking-wide">
+        <div className="space-y-1.5 relative">
+          <div className="flex md:hidden items-center justify-center my-1">
+            <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-gradient-start to-gradient-end rounded-lg shadow-sm text-white text-[10px] font-bold">
               VS
             </div>
           </div>
-          <label className="text-xs font-semibold text-muted-foreground block">
+          <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide block">
             İkinci Dilekçe
           </label>
           <div className="relative">
             <textarea
               value={text2}
               onChange={(e) => setText2(e.target.value)}
-              placeholder="İkinci dilekçe metnini buraya yapıştırın..."
-              className="w-full h-56 p-4 text-sm leading-relaxed border border-border rounded-2xl bg-muted/30 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 placeholder:text-muted-foreground/40 transition-all duration-200"
+              placeholder="İkinci dilekçe metnini yapıştırın..."
+              className="w-full h-52 p-3.5 text-sm leading-relaxed border border-border rounded-xl bg-muted/20 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 placeholder:text-muted-foreground/40 transition-all duration-200"
               disabled={loading}
             />
-            <div className="absolute bottom-3 right-3 flex items-center gap-2">
+            <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5">
               {text2.length > 0 && (
-                <span className="bg-white/80 backdrop-blur-sm border border-border text-xs text-muted-foreground px-2 py-1 rounded-lg">
+                <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                  text2.length > MAX_CHARS
+                    ? "text-red-600 bg-red-50 border-red-200"
+                    : "text-muted-foreground bg-white/90 border-border"
+                }`}>
                   {text2.length.toLocaleString("tr-TR")}
                 </span>
               )}
               <button
                 type="button"
                 onClick={handlePaste2}
-                className="bg-white/80 backdrop-blur-sm border border-border p-1.5 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                className="bg-white/90 border border-border p-1 rounded-md hover:bg-muted transition-colors cursor-pointer"
               >
-                <Clipboard className="h-3.5 w-3.5 text-muted-foreground" />
+                <Clipboard className="h-3 w-3 text-muted-foreground" />
               </button>
             </div>
           </div>
@@ -150,16 +161,11 @@ export function CompareForm({ onResult, onError }: CompareFormProps) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
-          <GitCompareArrows className="h-3.5 w-3.5" />
-          <span>İki dilekçeyi yan yana karşılaştırın</span>
-        </div>
-
+      <div className="flex items-center justify-end">
         <button
           type="submit"
-          disabled={!text1.trim() || !text2.trim() || loading}
-          className="flex items-center gap-2 bg-gradient-to-r from-gradient-start to-gradient-end text-white px-7 py-2.5 rounded-xl text-sm font-semibold hover:shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-300 cursor-pointer"
+          disabled={!text1.trim() || !text2.trim() || loading || text1.length > MAX_CHARS || text2.length > MAX_CHARS}
+          className="flex items-center gap-2 bg-gradient-to-r from-gradient-start to-gradient-end text-white px-6 py-2 rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
         >
           <GitCompareArrows className="h-4 w-4" />
           {loading ? "Karşılaştırılıyor..." : "Karşılaştır"}

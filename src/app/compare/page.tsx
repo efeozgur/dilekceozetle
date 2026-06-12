@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { CompareForm } from "@/components/CompareForm";
 import { CompareResult } from "@/components/CompareResult";
 import { ErrorDisplay } from "@/components/ErrorDisplay";
-import { GitCompareArrows, ArrowRight, Sparkles } from "lucide-react";
+import { GitCompareArrows, LogIn, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { motion } from "motion/react";
 
 type ViewState = "form" | "result" | "error";
 
 export default function ComparePage() {
+  const { data: session } = useSession();
   const [view, setView] = useState<ViewState>("form");
   const [result, setResult] = useState("");
   const [error, setError] = useState("");
@@ -30,82 +33,121 @@ export default function ComparePage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20">
-      {/* Hero Section */}
-      <div className="text-center mb-14">
-        <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-700 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 tracking-wide uppercase">
-          <GitCompareArrows className="h-3.5 w-3.5" />
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      {/* Header */}
+      <div className="mb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2 bg-primary/5 border border-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4"
+        >
+          <GitCompareArrows className="h-4 w-4" />
           Dilekçe Karşılaştırma
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground mb-4 leading-tight">
-          İki Dilekçeyi
-          <span className="bg-gradient-to-r from-gradient-start to-gradient-end bg-clip-text text-transparent"> Karşılaştırın</span>
-        </h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-          İki farklı dilekçe metnini yapıştırın, yapay zeka motorumuz
-          arasındaki farkları tespit etsin ve madde madde sunsun.
-        </p>
+        </motion.div>
+        <motion.h1
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground mb-3"
+        >
+          İki Dilekçeyi{" "}
+          <span className="text-gradient">Karşılaştırın</span>
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-lg text-muted-foreground max-w-2xl"
+        >
+          İki dilekçe metnini yapıştırın, yapay zeka aralarındaki farkları kategorize etsin.
+        </motion.p>
       </div>
 
-      {/* Main Card */}
-      <div className="bg-white border border-border rounded-3xl shadow-sm shadow-border/50 p-6 sm:p-8 mb-14">
-        {view === "form" && (
-          <CompareForm onResult={handleResult} onError={handleError} />
-        )}
-
-        {view === "result" && result && (
-          <CompareResult result={result} onReset={handleReset} />
-        )}
-
-        {view === "error" && (
-          <div className="space-y-4">
-            <ErrorDisplay message={error} onDismiss={handleReset} />
-            <CompareForm onResult={handleResult} onError={handleError} />
-          </div>
-        )}
-      </div>
-
-      {/* Features */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div className="group relative bg-white border border-border rounded-2xl p-6 overflow-hidden hover:shadow-lg hover:border-indigo-200 transition-all duration-300">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-indigo-500/5 to-violet-500/10 rounded-bl-[3rem] -z-0" />
-          <div className="relative z-10">
-            <div className="inline-flex items-center justify-center w-11 h-11 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-indigo-500/20">
-              <GitCompareArrows className="h-5 w-5 text-white" />
+      {!session ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative"
+        >
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-violet-500/20 rounded-3xl blur-xl opacity-50" />
+          <div className="relative bg-white border border-border rounded-2xl p-10 sm:p-14 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-gradient-start to-gradient-end rounded-2xl shadow-lg shadow-primary/20 mb-6">
+              <LogIn className="h-7 w-7 text-white" />
             </div>
-            <h3 className="font-semibold text-foreground mb-1.5 text-sm">Fark Tespiti</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              İki metin arasındaki talepler, iddialar ve olay örgüsü farkları tespit edilir
+            <h2 className="text-xl font-bold text-foreground mb-3">
+              Karşılaştırma için giriş yapın
+            </h2>
+            <p className="text-sm text-muted-foreground mb-8 max-w-md mx-auto">
+              İki dilekçe arasındaki farkları görmek için giriş yapın veya ücretsiz hesap oluşturun.
             </p>
-          </div>
-        </div>
-
-        <div className="group relative bg-white border border-border rounded-2xl p-6 overflow-hidden hover:shadow-lg hover:border-emerald-200 transition-all duration-300">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-500/5 to-teal-500/10 rounded-bl-[3rem] -z-0" />
-          <div className="relative z-10">
-            <div className="inline-flex items-center justify-center w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-emerald-500/20">
-              <Sparkles className="h-5 w-5 text-white" />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a
+                href="/auth/login"
+                className="group inline-flex items-center gap-2 bg-gradient-to-r from-gradient-start to-gradient-end text-white px-6 py-3 rounded-xl text-sm font-semibold hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <LogIn className="h-4 w-4" />
+                Giriş Yap
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </a>
+              <a
+                href="/auth/register"
+                className="inline-flex items-center gap-2 border-2 border-border text-foreground px-6 py-3 rounded-xl text-sm font-semibold hover:bg-muted hover:border-primary/20 transition-all duration-200"
+              >
+                Kayıt Ol
+              </a>
             </div>
-            <h3 className="font-semibold text-foreground mb-1.5 text-sm">Kategorize Analiz</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Farklar kategorilere ayrılır: Talepler, İddialar, Olay Örgüsü, Hukuki Dayanak
-            </p>
-          </div>
-        </div>
 
-        <div className="group relative bg-white border border-border rounded-2xl p-6 overflow-hidden hover:shadow-lg hover:border-amber-200 transition-all duration-300">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-500/5 to-orange-500/10 rounded-bl-[3rem] -z-0" />
-          <div className="relative z-10">
-            <div className="inline-flex items-center justify-center w-11 h-11 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-amber-500/20">
-              <ArrowRight className="h-5 w-5 text-white" />
+            {/* Features hint */}
+            <div className="mt-10 pt-8 border-t border-border">
+              <p className="text-xs text-muted-foreground mb-4">Karşılaştırma özellikleri:</p>
+              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                  Talep farklılıkları
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                  Hukuki dayanak analizi
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                  Kategorize sonuçlar
+                </span>
+              </div>
             </div>
-            <h3 className="font-semibold text-foreground mb-1.5 text-sm">Önem Sıralaması</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Farklar kritikten düşüğe doğru sıralanır, en önemli değişiklikler öne çıkar
-            </p>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="relative">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/10 to-violet-500/10 rounded-2xl blur opacity-50" />
+            <div className="relative bg-white border border-border rounded-2xl p-6 sm:p-8 shadow-lg">
+              {view === "form" && (
+                <CompareForm onResult={handleResult} onError={handleError} />
+              )}
+
+              {view === "result" && result && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <CompareResult result={result} onReset={handleReset} />
+                </motion.div>
+              )}
+
+              {view === "error" && (
+                <div className="space-y-4">
+                  <ErrorDisplay message={error} onDismiss={handleReset} />
+                  <CompareForm onResult={handleResult} onError={handleError} />
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

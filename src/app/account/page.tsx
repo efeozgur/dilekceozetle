@@ -65,90 +65,80 @@ export default async function AccountPage() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground">Hesabım</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Hesap bilgilerinizi ve kullanım istatistiklerinizi görüntüleyin
         </p>
       </div>
 
-      {/* Kullanıcı Bilgileri */}
-      <div className="bg-white border border-border rounded-2xl p-6 shadow-sm mb-6 hover:shadow-md transition-all duration-300">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-gradient-start via-primary to-gradient-end rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-primary/30 animate-pulse transition-all duration-700">
-              {user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">
+      {/* Profile Card */}
+      <div className="bg-white border border-border rounded-xl p-5 mb-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-gradient-start to-gradient-end rounded-xl flex items-center justify-center text-white text-lg font-bold shadow-md shadow-primary/20">
+            {user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-semibold text-foreground truncate">
                 {user.name || "İsimsiz Kullanıcı"}
               </h2>
-              <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-                <Mail className="h-3.5 w-3.5" />
-                {user.email}
-              </p>
+              {isPro ? (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold text-primary bg-primary/5 border border-primary/15">
+                  <Crown className="h-3 w-3" />
+                  PRO
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-muted border border-border text-muted-foreground rounded-md text-[10px] font-medium">
+                  Free
+                </span>
+              )}
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {isPro ? (
-              <span
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border"
-                style={{
-                  background: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fde68a 100%)",
-                  borderColor: "rgba(245, 158, 11, 0.4)",
-                  color: "#92400e",
-                  animation: "pro-badge-pulse 2s ease-in-out infinite",
-                }}
-              >
-                <Crown className="h-3.5 w-3.5" />
-                PRO
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted border border-border text-muted-foreground rounded-full text-xs font-semibold">
-                Free Üye
-              </span>
-            )}
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
+              <Mail className="h-3 w-3" />
+              {user.email}
+            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-border">
-          <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-all duration-200">
-            <div className="flex items-center justify-center w-10 h-10 bg-blue-50 rounded-xl">
-              <Calendar className="h-5 w-5 text-blue-600" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-5 border-t border-border">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-8 h-8 bg-blue-50 rounded-lg">
+              <Calendar className="h-4 w-4 text-blue-600" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Üyelik Tarihi</p>
-              <p className="text-sm font-medium">
+              <p className="text-[10px] text-muted-foreground">Üyelik</p>
+              <p className="text-xs font-medium">
                 {new Date(user.createdAt).toLocaleDateString("tr-TR")}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-all duration-200">
-            <div className="flex items-center justify-center w-10 h-10 bg-emerald-50 rounded-xl">
-              <Clock className="h-5 w-5 text-emerald-600" />
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-8 h-8 bg-emerald-50 rounded-lg">
+              <Clock className="h-4 w-4 text-emerald-600" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Gün Sayısı</p>
-              <p className="text-sm font-medium">{daysSinceRegistration} gün</p>
+              <p className="text-[10px] text-muted-foreground">Süre</p>
+              <p className="text-xs font-medium">{daysSinceRegistration} gün</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-all duration-200">
-            <div className="flex items-center justify-center w-10 h-10 bg-violet-50 rounded-xl">
-              <FileText className="h-5 w-5 text-violet-600" />
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-8 h-8 bg-violet-50 rounded-lg">
+              <FileText className="h-4 w-4 text-violet-600" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Toplam Özet</p>
-              <p className="text-sm font-medium">{user._count.summaries}</p>
+              <p className="text-[10px] text-muted-foreground">Özet</p>
+              <p className="text-xs font-medium">{user._count.summaries}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-all duration-200">
-            <div className="flex items-center justify-center w-10 h-10 bg-amber-50 rounded-xl">
-              <Zap className="h-5 w-5 text-amber-600" />
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-8 h-8 bg-amber-50 rounded-lg">
+              <Zap className="h-4 w-4 text-amber-600" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Token Kullanımı</p>
-              <p className="text-sm font-medium">
+              <p className="text-[10px] text-muted-foreground">Token</p>
+              <p className="text-xs font-medium">
                 {(summaryStats._sum.tokenEstimate || 0).toLocaleString("tr-TR")}
               </p>
             </div>
@@ -156,181 +146,139 @@ export default async function AccountPage() {
         </div>
       </div>
 
-      {/* Abonelik Durumu - Premium Card */}
-      <div
-        className={`border rounded-2xl p-6 shadow-sm mb-6 transition-all duration-500 hover:shadow-md relative overflow-hidden ${
-          isPro
-            ? "border-amber-200/60"
-            : "bg-white border-border"
-        }`}
-      >
-        {isPro && (
-          <div
-            className="absolute inset-0 rounded-2xl pointer-events-none"
-            style={{
-              background: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 25%, #fde68a 50%, #fef3c7 75%, #fffbeb 100%)",
-              backgroundSize: "200% 200%",
-              animation: "pro-gradient-flow 6s ease-in-out infinite",
-            }}
-          />
-        )}
-
-        <div className="relative z-10">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                {isPro ? (
-                  <Crown className="h-5 w-5 text-amber-600" style={{ animation: "pro-crown-glow 2s ease-in-out infinite" }} />
-                ) : null}
-                Abonelik Durumu
-              </h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                {isPro
-                  ? "Pro üyeliğiniz aktif. Tüm özelliklere erişiminiz var."
-                  : "Free plan kullanıyorsunuz. Pro'ya yükselterek sınırsız erişim kazanın."}
-              </p>
-            </div>
-            {!isPro && (
-              <Link
-                href="/upgrade"
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-gradient-to-r from-gradient-start to-gradient-end text-white rounded-xl hover:opacity-90 transition-all shadow-sm shadow-primary/25"
-              >
-                <Crown className="h-4 w-4" />
-                Pro&apos;ya Yükselt
-              </Link>
-            )}
+      {/* Subscription */}
+      <div className="bg-white border border-border rounded-xl p-5 mb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              {isPro && <Crown className="h-4 w-4 text-primary" />}
+              Abonelik Durumu
+            </h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              {isPro
+                ? "Pro üyeliğiniz aktif. Tüm özelliklere erişiminiz var."
+                : "Free plan kullanıyorsunuz. Pro'ya yükselterek sınırsız erişim kazanın."}
+            </p>
           </div>
-
-          {isPro && user.proActivatedAt && (
-            <div className="mt-5 pt-5 border-t border-amber-200/50 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3.5 border border-amber-100/50">
-                <p className="text-[10px] font-semibold text-amber-700 uppercase tracking-wide">Son Aktivasyon</p>
-                <p className="text-sm font-bold text-amber-900 mt-1">
-                  {new Date(user.proActivatedAt).toLocaleDateString("tr-TR")}
-                </p>
-              </div>
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3.5 border border-amber-100/50">
-                <p className="text-[10px] font-semibold text-amber-700 uppercase tracking-wide">Yükseltme</p>
-                <p className="text-sm font-bold text-amber-900 mt-1">{user.proUpgradeCount} kez</p>
-              </div>
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3.5 border border-amber-100/50">
-                <p className="text-[10px] font-semibold text-amber-700 uppercase tracking-wide">Toplam Özet</p>
-                <p className="text-sm font-bold text-amber-900 mt-1">{user._count.summaries}</p>
-              </div>
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3.5 border border-amber-100/50">
-                <p className="text-[10px] font-semibold text-amber-700 uppercase tracking-wide">Üyelik Süresi</p>
-                <p className="text-sm font-bold text-amber-900 mt-1">{daysSinceRegistration} gün</p>
-              </div>
-            </div>
-          )}
-
           {!isPro && (
-            <div className="mt-4 pt-4 border-t border-border">
-              <UsageBar
-                used={user._count.summaries}
-                total={5}
-                subscription={user.subscription}
-              />
-            </div>
-          )}
-
-          {user.pendingPayment && !isPro && (
-            <div className="mt-4 pt-4 border-t border-border">
-              <div className="flex items-center gap-2 text-amber-700 text-sm">
-                <Clock className="h-4 w-4" />
-                <span>Bekleyen ödeme talebiniz var. Onay bekleniyor.</span>
-              </div>
-            </div>
+            <Link
+              href="/upgrade"
+              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium bg-gradient-to-r from-gradient-start to-gradient-end text-white rounded-lg hover:shadow-md hover:shadow-primary/20 transition-all"
+            >
+              <Crown className="h-3.5 w-3.5" />
+              Pro&apos;ya Geç
+            </Link>
           )}
         </div>
+
+        {isPro && user.proActivatedAt && (
+          <div className="mt-4 pt-4 border-t border-border grid grid-cols-3 gap-3">
+            <div className="bg-muted/30 rounded-lg p-3">
+              <p className="text-[10px] font-medium text-muted-foreground">Aktivasyon</p>
+              <p className="text-xs font-bold text-foreground mt-0.5">
+                {new Date(user.proActivatedAt).toLocaleDateString("tr-TR")}
+              </p>
+            </div>
+            <div className="bg-muted/30 rounded-lg p-3">
+              <p className="text-[10px] font-medium text-muted-foreground">Yükseltme</p>
+              <p className="text-xs font-bold text-foreground mt-0.5">{user.proUpgradeCount} kez</p>
+            </div>
+            <div className="bg-muted/30 rounded-lg p-3">
+              <p className="text-[10px] font-medium text-muted-foreground">Toplam Özet</p>
+              <p className="text-xs font-bold text-foreground mt-0.5">{user._count.summaries}</p>
+            </div>
+          </div>
+        )}
+
+        {!isPro && (
+          <div className="mt-4 pt-4 border-t border-border">
+            <UsageBar
+              used={user._count.summaries}
+              total={5}
+              subscription={user.subscription}
+            />
+          </div>
+        )}
+
+        {user.pendingPayment && !isPro && (
+          <div className="mt-4 pt-4 border-t border-border">
+            <div className="flex items-center gap-2 text-amber-700 text-xs">
+              <Clock className="h-3.5 w-3.5" />
+              <span>Bekleyen ödeme talebiniz var. Onay bekleniyor.</span>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* İstatistikler */}
-      <div className={`border rounded-2xl p-6 shadow-sm mb-6 hover:shadow-md transition-all duration-300 ${
-        isPro ? "bg-white border-amber-200/40" : "bg-white border-border"
-      }`}>
-        <h3 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
-          <TrendingUp className={`h-5 w-5 ${isPro ? "text-amber-600" : "text-primary"}`} />
+      {/* Stats */}
+      <div className="bg-white border border-border rounded-xl p-5 mb-4">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-4">
+          <TrendingUp className="h-4 w-4 text-primary" />
           Kullanım İstatistikleri
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <div className={`rounded-xl p-4 hover:shadow-sm hover:scale-[1.02] transition-all duration-200 cursor-default ${
-            isPro
-              ? "bg-amber-50/50 border border-amber-100/50"
-              : "bg-muted/30 hover:bg-muted/60"
-          }`}>
-            <p className="text-xs text-muted-foreground">Toplam Karakter</p>
-            <p className={`text-lg font-bold mt-1 ${isPro ? "text-amber-900" : "text-foreground"}`}>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-muted/20 rounded-lg p-3">
+            <p className="text-[10px] text-muted-foreground">Toplam Karakter</p>
+            <p className="text-sm font-bold mt-0.5">
               {(summaryStats._sum.charCount || 0).toLocaleString("tr-TR")}
             </p>
           </div>
-          <div className={`rounded-xl p-4 hover:shadow-sm hover:scale-[1.02] transition-all duration-200 cursor-default ${
-            isPro
-              ? "bg-amber-50/50 border border-amber-100/50"
-              : "bg-muted/30 hover:bg-muted/60"
-          }`}>
-            <p className="text-xs text-muted-foreground">Ortalama Özet Uzunluğu</p>
-            <p className={`text-lg font-bold mt-1 ${isPro ? "text-amber-900" : "text-foreground"}`}>
+          <div className="bg-muted/20 rounded-lg p-3">
+            <p className="text-[10px] text-muted-foreground">Ort. Özet</p>
+            <p className="text-sm font-bold mt-0.5">
               {Math.round(summaryStats._avg.charCount || 0).toLocaleString("tr-TR")}
             </p>
           </div>
-          <div className={`rounded-xl p-4 hover:shadow-sm hover:scale-[1.02] transition-all duration-200 cursor-default ${
-            isPro
-              ? "bg-amber-50/50 border border-amber-100/50"
-              : "bg-muted/30 hover:bg-muted/60"
-          }`}>
-            <p className="text-xs text-muted-foreground">Toplam Token</p>
-            <p className={`text-lg font-bold mt-1 ${isPro ? "text-amber-900" : "text-foreground"}`}>
+          <div className="bg-muted/20 rounded-lg p-3">
+            <p className="text-[10px] text-muted-foreground">Toplam Token</p>
+            <p className="text-sm font-bold mt-0.5">
               {(summaryStats._sum.tokenEstimate || 0).toLocaleString("tr-TR")}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Son Özetler */}
-      <div className="bg-white border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-foreground">Son Özetler</h3>
+      {/* Recent Summaries */}
+      <div className="bg-white border border-border rounded-xl p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-foreground">Son Özetler</h3>
           <Link
             href="/dashboard"
-            className="text-sm text-primary hover:text-primary-dark font-medium inline-flex items-center gap-1"
+            className="text-[11px] text-primary hover:text-primary-dark font-medium inline-flex items-center gap-1"
           >
             Tümünü Gör
-            <ArrowUpRight className="h-3.5 w-3.5" />
+            <ArrowUpRight className="h-3 w-3" />
           </Link>
         </div>
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {recentSummaries.map((s) => (
             <Link
               key={s.id}
               href="/dashboard"
-              className="flex items-center justify-between py-3 px-3 rounded-xl hover:bg-muted/50 transition-all duration-200 group -mx-3"
+              className="flex items-center justify-between py-2.5 px-2 rounded-lg hover:bg-muted/40 transition-all group"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center group-hover:bg-primary/5 group-hover:text-primary transition-all duration-200">
-                  <FileText className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-all duration-200" />
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center group-hover:bg-primary/5 transition-colors">
+                  <FileText className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground group-hover:text-primary transition-all duration-200">
+                  <p className="text-xs font-medium text-foreground">
                     {s.charCount.toLocaleString("tr-TR")} karakter
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-[10px] text-muted-foreground">
                     {new Date(s.createdAt).toLocaleDateString("tr-TR")}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                {s.summaryCharCount && (
-                  <span className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-1 rounded-full group-hover:bg-emerald-100 transition-all duration-200">
-                    {s.summaryCharCount.toLocaleString("tr-TR")} karakter özet
-                  </span>
-                )}
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground/0 group-hover:text-muted-foreground transition-all duration-200" />
-              </div>
+              {s.summaryCharCount && (
+                <span className="text-[10px] text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded">
+                  {s.summaryCharCount.toLocaleString("tr-TR")} kr özet
+                </span>
+              )}
             </Link>
           ))}
           {recentSummaries.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-6">
+            <p className="text-xs text-muted-foreground text-center py-5">
               Henüz özet oluşturmadınız
             </p>
           )}

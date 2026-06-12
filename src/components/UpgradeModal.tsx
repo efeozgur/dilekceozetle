@@ -13,20 +13,20 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-3xl shadow-2xl p-8 max-w-md mx-4 text-center space-y-5">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm mx-4 text-center space-y-4">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors cursor-pointer"
+          className="absolute top-3 right-3 p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer"
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </button>
 
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl shadow-lg shadow-amber-500/25">
-          <Crown className="h-8 w-8 text-white" />
+        <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-gradient-start to-gradient-end rounded-xl shadow-lg shadow-primary/20">
+          <Crown className="h-6 w-6 text-white" />
         </div>
 
-        <h2 className="text-xl font-bold text-foreground">
+        <h2 className="text-lg font-bold text-foreground">
           Ücretsiz Kullanım Hakkınız Doldu
         </h2>
 
@@ -36,17 +36,17 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
           özelliklerinden yararlanabilirsiniz.
         </p>
 
-        <div className="flex items-center gap-3 justify-center">
+        <div className="flex items-center gap-2 justify-center">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground border border-border rounded-xl hover:bg-muted transition-all cursor-pointer"
+            className="px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground border border-border rounded-lg hover:bg-muted transition-all cursor-pointer"
           >
             Kapat
           </button>
           <Link
             href="/upgrade"
             onClick={onClose}
-            className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-gradient-start to-gradient-end rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all"
+            className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-gradient-start to-gradient-end rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all"
           >
             Pro&apos;ya Yükselt
           </Link>

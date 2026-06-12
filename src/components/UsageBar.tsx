@@ -18,26 +18,18 @@ export function UsageBar({ used, total, subscription, compact = false }: UsageBa
 
   if (isPro) {
     return (
-      <div className="relative overflow-hidden bg-gradient-to-r from-amber-50 via-amber-100/50 to-orange-50 border border-amber-200 rounded-2xl px-5 py-3.5 flex items-center justify-between group">
-        <div
-          className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)",
-            backgroundSize: "200% 100%",
-            animation: "pro-card-shimmer 3s ease-in-out infinite",
-          }}
-        />
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="relative">
-            <Crown className="h-5 w-5 text-amber-600" style={{ animation: "pro-crown-glow 2s ease-in-out infinite" }} />
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary/5 via-violet-50/50 to-primary/5 border border-primary/10 rounded-xl px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="flex items-center justify-center w-7 h-7 bg-gradient-to-br from-gradient-start to-gradient-end rounded-lg shadow-sm">
+            <Crown className="h-3.5 w-3.5 text-white" />
           </div>
           <div>
-            <span className="text-sm font-bold text-amber-800">Sınırsız Kullanım</span>
-            <p className="text-[10px] text-amber-600/80">Tüm Pro özelliklerine erişiminiz var</p>
+            <span className="text-xs font-semibold text-foreground">Sınırsız Kullanım</span>
+            <p className="text-[10px] text-muted-foreground">Pro üyelik aktif</p>
           </div>
         </div>
-        <span className="relative z-10 inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50/80 border border-amber-200/60 px-2 py-1 rounded-lg shadow-sm">
-          <Crown className="h-3 w-3" />
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary bg-primary/5 border border-primary/15 px-2 py-0.5 rounded-md">
+          <Crown className="h-2.5 w-2.5" />
           PRO
         </span>
       </div>
@@ -46,25 +38,25 @@ export function UsageBar({ used, total, subscription, compact = false }: UsageBa
 
   if (compact) {
     return (
-      <div className="bg-white border border-border rounded-2xl px-5 py-3.5">
-        <div className="flex items-center justify-between mb-2.5">
-          <span className="text-xs font-medium text-muted-foreground">Ücretsiz Kullanım</span>
+      <div className="bg-white border border-border rounded-xl px-4 py-3">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[11px] font-medium text-muted-foreground">Ücretsiz Kullanım</span>
           <div className="flex items-center gap-2">
-            <span className={`text-xs font-bold ${isFull ? "text-red-500" : "text-foreground"}`}>
+            <span className={`text-[11px] font-bold ${isFull ? "text-red-500" : "text-foreground"}`}>
               {used}/{total}
             </span>
             {isFull && (
               <Link
                 href="/upgrade"
-                className="inline-flex items-center gap-1 text-[10px] font-semibold text-white bg-gradient-to-r from-gradient-start to-gradient-end px-2.5 py-1 rounded-lg hover:opacity-90 transition-all"
+                className="inline-flex items-center gap-1 text-[10px] font-semibold text-white bg-gradient-to-r from-gradient-start to-gradient-end px-2 py-0.5 rounded-md hover:opacity-90 transition-all"
               >
-                <Crown className="h-3 w-3" />
+                <Crown className="h-2.5 w-2.5" />
                 Yükselt
               </Link>
             )}
           </div>
         </div>
-        <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+        <div className="relative h-1.5 bg-muted rounded-full overflow-hidden">
           <div
             className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ${
               isFull
@@ -77,12 +69,12 @@ export function UsageBar({ used, total, subscription, compact = false }: UsageBa
           />
         </div>
         {!isFull && (
-          <p className="text-[10px] text-muted-foreground mt-1.5">
+          <p className="text-[10px] text-muted-foreground mt-1">
             {remaining} hakkınız kaldı
           </p>
         )}
         {isFull && (
-          <p className="text-[10px] text-red-500 font-medium mt-1.5">
+          <p className="text-[10px] text-red-500 font-medium mt-1">
             Hakkınız dolmuştur. Pro&apos;ya yükselterek sınırsız kullanın.
           </p>
         )}
@@ -91,15 +83,15 @@ export function UsageBar({ used, total, subscription, compact = false }: UsageBa
   }
 
   return (
-    <div className="bg-white border border-border rounded-2xl p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="text-sm font-semibold text-foreground">Ücretsiz Kullanım Hakkı</h4>
-        <span className={`text-sm font-bold ${isFull ? "text-red-500" : "text-foreground"}`}>
+    <div className="bg-white border border-border rounded-xl p-5">
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-xs font-semibold text-foreground">Ücretsiz Kullanım Hakkı</h4>
+        <span className={`text-xs font-bold ${isFull ? "text-red-500" : "text-foreground"}`}>
           {used} / {total}
         </span>
       </div>
 
-      <div className="relative h-3 bg-muted rounded-full overflow-hidden mb-4">
+      <div className="relative h-2 bg-muted rounded-full overflow-hidden mb-3">
         <div
           className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ${
             isFull
@@ -115,32 +107,26 @@ export function UsageBar({ used, total, subscription, compact = false }: UsageBa
       <div className="flex items-center justify-between">
         <div>
           {isFull ? (
-            <p className="text-sm text-red-500 font-medium">
+            <p className="text-xs text-red-500 font-medium">
               Hakkınız dolmuştur
             </p>
           ) : (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               <span className="font-semibold text-foreground">{remaining}</span> hakkınız kaldı
             </p>
           )}
         </div>
-        {isFull ? (
-          <Link
-            href="/upgrade"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-gradient-to-r from-gradient-start to-gradient-end px-4 py-2 rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all"
-          >
-            <Crown className="h-3.5 w-3.5" />
-            Pro&apos;ya Yükselt
-          </Link>
-        ) : (
-          <Link
-            href="/upgrade"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary-dark border border-primary/20 px-3 py-1.5 rounded-xl hover:bg-primary/5 transition-all"
-          >
-            <Crown className="h-3.5 w-3.5" />
-            Sınırsız Kullan
-          </Link>
-        )}
+        <Link
+          href="/upgrade"
+          className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-lg transition-all ${
+            isFull
+              ? "text-white bg-gradient-to-r from-gradient-start to-gradient-end hover:shadow-md hover:shadow-primary/20"
+              : "text-primary hover:text-primary-dark border border-primary/15 hover:bg-primary/5"
+          }`}
+        >
+          <Crown className="h-3 w-3" />
+          {isFull ? "Pro'ya Yükselt" : "Sınırsız Kullan"}
+        </Link>
       </div>
     </div>
   );

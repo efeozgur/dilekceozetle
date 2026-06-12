@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Check, RotateCcw, FileText, ChevronDown, ChevronUp, BarChart3 } from "lucide-react";
+import { Copy, Check, RotateCcw, FileText, ChevronDown, ChevronUp, BarChart3, Download, Sparkles } from "lucide-react";
 import { useState, useCallback } from "react";
 import { SummaryStats, type SummaryStatsData } from "./stats/SummaryStats";
 import { ExportMenu } from "./ExportMenu";
@@ -34,44 +34,63 @@ export function SummaryResult({
     }, 2000);
   }, [text]);
 
+  const compressionRatio = stats.charCount > 0 
+    ? Math.round((1 - stats.summaryCharCount / stats.charCount) * 100) 
+    : 0;
+
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Success Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full border border-emerald-200">
-            <Check className="h-3 w-3" />
-            Hazır
-          </span>
-          <h3 className="text-sm font-semibold text-foreground">Özet Sonucu</h3>
+          <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-xl shadow-lg shadow-emerald-500/20">
+            <Check className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h3 className="text-base font-semibold text-foreground">Özet Hazır</h3>
+            <p className="text-xs text-muted-foreground">
+              %{compressionRatio} sıkıştırma oranı
+            </p>
+          </div>
         </div>
-        <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-lg">
           <FileText className="h-3.5 w-3.5" />
           {text.length.toLocaleString("tr-TR")} karakter
-        </span>
-      </div>
-
-      {/* Summary Text - PROMINENT */}
-      <div className="relative p-6 bg-gradient-to-r from-indigo-50/80 via-white to-violet-50/80 border-l-4 border-l-indigo-500 rounded-2xl shadow-sm">
-        <div className="absolute top-3 right-3">
-          <span className="text-[10px] font-medium text-indigo-400 bg-indigo-50 px-2 py-0.5 rounded-full">
-            ÖZET
-          </span>
         </div>
-        <p className="text-base leading-relaxed text-foreground font-medium whitespace-pre-wrap">
-          {text}
-        </p>
       </div>
 
-      {/* Actions */}
+      {/* Summary Text - Premium Card */}
+      <div className="relative group">
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/10 via-violet-500/10 to-primary/10 rounded-2xl blur opacity-50" />
+        <div className="relative p-6 bg-gradient-to-br from-white via-primary/[0.02] to-violet-500/[0.02] border border-primary/10 rounded-2xl">
+          {/* Badge */}
+          <div className="absolute top-4 right-4">
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+              <Sparkles className="h-3 w-3" />
+              ÖZET
+            </span>
+          </div>
+          
+          {/* Text */}
+          <p className="text-base leading-relaxed text-foreground whitespace-pre-wrap pr-20">
+            {text}
+          </p>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
       <div className="flex items-center gap-3 flex-wrap">
         <button
           onClick={handleCopy}
-          className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground border border-border px-5 py-2.5 rounded-xl hover:bg-muted transition-all duration-200 cursor-pointer"
+          className={`flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-xl transition-all duration-200 cursor-pointer ${
+            copied
+              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+              : "text-foreground border border-border hover:bg-muted hover:border-primary/20"
+          }`}
         >
           {copied ? (
             <>
-              <Check className="h-4 w-4 text-emerald-600" />
+              <Check className="h-4 w-4" />
               Kopyalandı
             </>
           ) : (
@@ -102,9 +121,9 @@ export function SummaryResult({
 
         <button
           onClick={onReset}
-          className="flex items-center gap-2 text-sm font-medium bg-primary text-primary-foreground px-5 py-2.5 rounded-xl hover:bg-primary-dark transition-all duration-200 shadow-sm shadow-primary/25 cursor-pointer"
+          className="group flex items-center gap-2 text-sm font-medium bg-gradient-to-r from-gradient-start to-gradient-end text-white px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 cursor-pointer"
         >
-          <RotateCcw className="h-4 w-4" />
+          <RotateCcw className="h-4 w-4 group-hover:rotate-[-180deg] transition-transform duration-300" />
           Yeni Özet
         </button>
       </div>
@@ -113,24 +132,25 @@ export function SummaryResult({
       <div className="border-t border-border pt-4">
         <button
           onClick={() => setShowStats(!showStats)}
-          className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer group"
         >
-          {showStats ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-          <BarChart3 className="h-4 w-4" />
-          İstatistikleri {showStats ? "Gizle" : "Göster"}
+          <div className={`p-1.5 rounded-lg transition-all ${showStats ? "bg-primary/10" : "bg-muted group-hover:bg-muted"}`}>
+            {showStats ? (
+              <ChevronUp className="h-4 w-4 text-primary" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </div>
+          <BarChart3 className={`h-4 w-4 ${showStats ? "text-primary" : ""}`} />
+          <span>Detaylı İstatistikler</span>
         </button>
         {showStats && (
-          <div className="mt-4">
+          <div className="mt-4 animate-fade-in-up">
             <SummaryStats data={stats} />
           </div>
         )}
       </div>
 
-      {/* Toast feedback */}
       {showToast && (
         <Toast
           message="Özet panoya kopyalandı!"

@@ -77,10 +77,8 @@ export default function ProActivatedOverlay({ show, onComplete }: ProActivatedOv
           : "pro-overlay-fadein 0.3s ease-out forwards",
       }}
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
 
-      {/* Star burst particles */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         {stars.map((s, i) => (
           <div
@@ -93,7 +91,7 @@ export default function ProActivatedOverlay({ show, onComplete }: ProActivatedOv
               left: "50%",
               marginTop: -s.size / 2,
               marginLeft: -s.size / 2,
-              background: "gold",
+              background: "#818cf8",
               borderRadius: s.isOdd ? 0 : "50%",
               clipPath: s.isOdd
                 ? "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)"
@@ -107,7 +105,6 @@ export default function ProActivatedOverlay({ show, onComplete }: ProActivatedOv
         ))}
       </div>
 
-      {/* Expanding rings */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         {Array.from({ length: RING_COUNT }).map((_, i) => (
           <div
@@ -118,7 +115,7 @@ export default function ProActivatedOverlay({ show, onComplete }: ProActivatedOv
               height: 80,
               top: "50%",
               left: "50%",
-              borderColor: `rgba(251, 191, 36, ${0.5 - i * 0.12})`,
+              borderColor: `rgba(79, 70, 229, ${0.4 - i * 0.1})`,
               animation: `pro-ring-expand 1.2s ease-out ${0.1 + i * 0.2}s forwards`,
               opacity: 0,
             }}
@@ -126,16 +123,14 @@ export default function ProActivatedOverlay({ show, onComplete }: ProActivatedOv
         ))}
       </div>
 
-      {/* Center card */}
       <div
         className="relative z-10 flex flex-col items-center px-8 py-10 rounded-3xl max-w-sm mx-4"
         style={{
-          background: "linear-gradient(135deg, #fffbeb 0%, #fef3c7 30%, #fde68a 70%, #fbbf24 100%)",
-          border: "2px solid rgba(234, 179, 8, 0.4)",
+          background: "linear-gradient(135deg, #eef2ff 0%, #e0e7ff 30%, #c7d2fe 70%, #a5b4fc 100%)",
+          border: "2px solid rgba(79, 70, 229, 0.3)",
           animation: "pro-glow-pulse 2s ease-in-out infinite 0.5s",
         }}
       >
-        {/* Close button */}
         <button
           onClick={() => {
             clearTimers();
@@ -145,13 +140,12 @@ export default function ProActivatedOverlay({ show, onComplete }: ProActivatedOv
               onComplete();
             }, 800);
           }}
-          className="absolute top-3 right-3 p-1.5 rounded-full z-20 transition-colors cursor-pointer hover:bg-amber-200/50"
-          style={{ color: "#92400e" }}
+          className="absolute top-3 right-3 p-1.5 rounded-full z-20 transition-colors cursor-pointer hover:bg-primary/10"
+          style={{ color: "#3730a3" }}
         >
           <X className="h-4 w-4" />
         </button>
 
-        {/* Shimmer */}
         <div
           className="absolute inset-0 rounded-3xl pointer-events-none"
           style={{
@@ -161,7 +155,6 @@ export default function ProActivatedOverlay({ show, onComplete }: ProActivatedOv
           }}
         />
 
-        {/* Sparkles */}
         <div className="absolute inset-0 rounded-3xl pointer-events-none overflow-hidden">
           {sparkles.map((s) => (
             <div
@@ -172,14 +165,13 @@ export default function ProActivatedOverlay({ show, onComplete }: ProActivatedOv
                 height: s.size,
                 top: `${s.top}%`,
                 left: `${s.left}%`,
-                background: "linear-gradient(135deg, #fbbf24, #f59e0b)",
+                background: "linear-gradient(135deg, #818cf8, #6366f1)",
                 animation: `pro-sparkle 2s ease-in-out ${s.delay}s infinite`,
               }}
             />
           ))}
         </div>
 
-        {/* Crown */}
         <div
           className="relative mb-4"
           style={{
@@ -191,46 +183,45 @@ export default function ProActivatedOverlay({ show, onComplete }: ProActivatedOv
               <path
                 d="M8 44L14 18L24 32L32 12L40 32L50 18L56 44H8Z"
                 fill="url(#proCrownGrad)"
-                stroke="#b45309"
+                stroke="#3730a3"
                 strokeWidth="2"
                 strokeLinejoin="round"
               />
-              <rect x="8" y="44" width="48" height="8" rx="2" fill="url(#proCrownBand)" stroke="#b45309" strokeWidth="1.5" />
-              <circle cx="14" cy="18" r="3" fill="#f59e0b" stroke="#b45309" strokeWidth="1" />
-              <circle cx="32" cy="12" r="3.5" fill="#f59e0b" stroke="#b45309" strokeWidth="1" />
-              <circle cx="50" cy="18" r="3" fill="#f59e0b" stroke="#b45309" strokeWidth="1" />
-              <circle cx="24" cy="30" r="2" fill="#fcd34d" />
-              <circle cx="40" cy="30" r="2" fill="#fcd34d" />
-              <circle cx="20" cy="47" r="1.5" fill="#fcd34d" />
-              <circle cx="32" cy="47" r="1.5" fill="#fcd34d" />
-              <circle cx="44" cy="47" r="1.5" fill="#fcd34d" />
+              <rect x="8" y="44" width="48" height="8" rx="2" fill="url(#proCrownBand)" stroke="#3730a3" strokeWidth="1.5" />
+              <circle cx="14" cy="18" r="3" fill="#6366f1" stroke="#3730a3" strokeWidth="1" />
+              <circle cx="32" cy="12" r="3.5" fill="#6366f1" stroke="#3730a3" strokeWidth="1" />
+              <circle cx="50" cy="18" r="3" fill="#6366f1" stroke="#3730a3" strokeWidth="1" />
+              <circle cx="24" cy="30" r="2" fill="#a5b4fc" />
+              <circle cx="40" cy="30" r="2" fill="#a5b4fc" />
+              <circle cx="20" cy="47" r="1.5" fill="#a5b4fc" />
+              <circle cx="32" cy="47" r="1.5" fill="#a5b4fc" />
+              <circle cx="44" cy="47" r="1.5" fill="#a5b4fc" />
               <defs>
                 <linearGradient id="proCrownGrad" x1="8" y1="12" x2="56" y2="44">
-                  <stop stopColor="#fbbf24" />
-                  <stop offset="0.5" stopColor="#f59e0b" />
-                  <stop offset="1" stopColor="#d97706" />
+                  <stop stopColor="#818cf8" />
+                  <stop offset="0.5" stopColor="#6366f1" />
+                  <stop offset="1" stopColor="#4f46e5" />
                 </linearGradient>
                 <linearGradient id="proCrownBand" x1="8" y1="44" x2="56" y2="52">
-                  <stop stopColor="#f59e0b" />
-                  <stop offset="1" stopColor="#d97706" />
+                  <stop stopColor="#6366f1" />
+                  <stop offset="1" stopColor="#4f46e5" />
                 </linearGradient>
               </defs>
             </svg>
           </div>
         </div>
 
-        {/* Text */}
         <div
           className="text-center relative z-10"
           style={{ animation: "pro-text-enter 0.5s ease-out 0.4s both" }}
         >
           <h2
             className="text-xl sm:text-2xl font-bold mb-2"
-            style={{ color: "#92400e", textShadow: "0 1px 2px rgba(0,0,0,0.1)" }}
+            style={{ color: "#3730a3", textShadow: "0 1px 2px rgba(0,0,0,0.08)" }}
           >
             Pro üyeliğiniz aktif edildi!
           </h2>
-          <p className="text-sm sm:text-base leading-relaxed" style={{ color: "#a16207" }}>
+          <p className="text-sm sm:text-base leading-relaxed" style={{ color: "#4338ca" }}>
             Sınırsız özetleme, karşılaştırma ve diğer Pro özelliklerinin keyfini çıkarın.
           </p>
         </div>
